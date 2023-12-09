@@ -1,8 +1,8 @@
 <script lang="tsx">
 import {defineComponent, ref} from "vue";
-import {ProductModel} from "@/base/model/ProductModel";
+import {ProductModel} from "@/base/model/product.model";
 import RatingComponent from "@/components/rating/RatingComponent.vue";
-import formatMoney from "@/plugins/utils";
+import {formatMoney} from "@/plugins/utils";
 
 export default defineComponent({
 	name: 'ProductComponent',

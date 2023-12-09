@@ -8,6 +8,10 @@ const router = createRouter({
             component: () => import('@/views/home/HomePage.vue')
         },
         {
+            path: '/:catchAll(.*)',
+            component: () => import('@/components/not-found/NotFound.vue')
+        },
+        {
             path: '/home',
             component: () => import('@/views/home/HomePage.vue')
         },
@@ -28,9 +32,21 @@ const router = createRouter({
             component: () => import('@/views/product/ProductPage.vue')
         },
         {
+            path: '/combos',
+            component: () => import('@/views/combo/ComboPage.vue')
+        },
+        {
             path: '/cart',
             component: () => import('@/views/cart/CartPage.vue'),
-        }
+        },
+        {
+            path: '/blogs',
+            component: () => import('@/views/blog/BlogPage.vue'),
+        },
+        {
+            path: '/bookings',
+            component: () => import('@/views/booking/BookingPage.vue'),
+        },
     ]
 })
 

@@ -25,20 +25,20 @@
 						</div>
 						<div>
 							<div>
-								<input class="form-control mb-3 mb-lg-2 mb-sm-2 mb-xxl-2" type="text" placeholder="Search" v-model="productSearchRequest.keyword"/>
+								<input class="form-control mb-3 mb-lg-2 mb-sm-2 mb-xxl-2" type="text" placeholder="Search" v-model="comboSearchRequest.name"/>
 							</div>
 							<!-- Categories -->
-<!--							<div>-->
-<!--								<h4>Category</h4>-->
-<!--								<ul class="m-4">-->
-<!--									<template v-for="item in categoryList" :key="item.id">-->
-<!--										<div>-->
-<!--											<input :id="item.name" class="m-1" type="checkbox" :value="item.id" :name="item.name" v-model="productSearchRequest.categoryIdList"/>-->
-<!--											<label :for="item.name">{{ item.name }}</label>-->
-<!--										</div>-->
-<!--									</template>-->
-<!--								</ul>-->
-<!--							</div>-->
+							<!--							<div>-->
+							<!--								<h4>Category</h4>-->
+							<!--								<ul class="m-4">-->
+							<!--									<template v-for="item in categoryList" :key="item.id">-->
+							<!--										<div>-->
+							<!--											<input :id="item.name" class="m-1" type="checkbox" :value="item.id" :name="item.name" v-model="productSearchRequest.categoryIdList"/>-->
+							<!--											<label :for="item.name">{{ item.name }}</label>-->
+							<!--										</div>-->
+							<!--									</template>-->
+							<!--								</ul>-->
+							<!--							</div>-->
 						</div>
 					</div>
 					<div class="col-md-10 box">
@@ -52,7 +52,7 @@
 						</div>
 						<div class="filters-content" v-if="!isLoading">
 							<div class="row grid">
-								<p>Có {{productPage.totalElements + ""}} sản phẩm</p>
+								<p>Có {{ productPage.totalElements + "" }} combo</p>
 							</div>
 							<div v-if="productList.length > 0" class="row grid">
 								<product-component
@@ -65,7 +65,7 @@
 							<div v-if="productList.length === 0" class="row grid">
 								<div class="col-md-12">
 									<div class="inner-content">
-										<h4 class="text-center">Không có sản phẩm nào </h4>
+										<h4 class="text-center">Không có combo nào </h4>
 									</div>
 								</div>
 							</div>
@@ -89,13 +89,13 @@ import ProductComponent from "@/components/product/ProductComponent.vue";
 import PageComponent from "@/components/pages/PageComponent.vue";
 import LoadingComponent from "@/components/loading/LoadingComponent.vue";
 import {PRODUCT_RESPONSIVE_CLASS} from "@/plugins/utils";
-import {ProductSearchRequest} from "@/base/client/request/product-search-request";
+import {ProductComboSearchRequest} from "@/base/client/request/product-search-request";
 import {Pageable} from "@/base/model/base.model";
 import {ProductModel} from "@/base/model/product.model";
 import {ProductService} from "@/base/service/product-service";
 
 export default defineComponent({
-	name: 'ProductPage',
+	name: 'ComboPage',
 	computed: {
 		PRODUCT_RESPONSIVE_CLASS() {
 			return PRODUCT_RESPONSIVE_CLASS
@@ -111,7 +111,7 @@ export default defineComponent({
 	data() {
 		return {
 			productService: new ProductService(),
-			productSearchRequest: new ProductSearchRequest(),
+			comboSearchRequest: new ProductComboSearchRequest(),
 			productPage: new Pageable<ProductModel>() as Pageable<ProductModel>,
 			productList: [] as ProductModel[],
 			categoryList: [],
@@ -121,7 +121,7 @@ export default defineComponent({
 	methods: {
 		findProductPage() {
 			this.isLoading = true;
-			this.productService.findBySearch(this.productSearchRequest).then((response) => {
+			this.productService.findCombo(this.comboSearchRequest).then((response) => {
 				this.productPage = response.data;
 				if (this.productPage.content) {
 					this.productList = this.productPage.content;
@@ -130,7 +130,7 @@ export default defineComponent({
 			})
 		},
 		pageChange(page: number) {
-			this.productSearchRequest.page = page;
+			this.comboSearchRequest.page = page;
 			this.findProductPage();
 		}
 	},

@@ -41,7 +41,7 @@ export default defineComponent({
 							) {
 								return (
 									<li key={pageNumber} class={page.value === pageNumber ? 'active' : ''}>
-										<a role="button" onClick={() => {page.value = pageNumber;pageChange(pageNumber)}}>
+										<a role="button" onClick={() => {page.value = pageNumber;pageChange(--pageNumber)}}>
 											{pageNumber}
 										</a>
 									</li>

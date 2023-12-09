@@ -15,10 +15,10 @@ export default defineComponent({
 	},
 	setup(props) {
 		const isShow = ref(props.showHeader);
-		const homeUri = ['/', '/home', '/index'];
 		const productUri = ['/product', '/products'];
-		const aboutUri = ['/about'];
-		const contactUri = ['/contact'];
+		const comboUri = ['/combos', '/combo'];
+		const bookingUri = ['/booking', '/bookings'];
+		const newsUri = ['/blog', '/blogs'];
 		const cartUri = ['/cart'];
 
 		const activeMenu = (uri: string[]) => {
@@ -42,14 +42,15 @@ export default defineComponent({
 			}
 		};
 
+		const isLogin = () => {
+			return localStorage.getItem('token') != null && localStorage.getItem('isLogin') != null && localStorage.getItem('isLogin') == 'true' && localStorage.getItem('user') != null;
+		}
+
 		window.addEventListener('scroll', scrollHandler);
 		watch(isShow, (value) => {
-			console.log('isShow changed:', value);
 			if (value) {
-				// Thêm sự kiện scroll khi isShow là true
 				window.addEventListener('scroll', scrollHandler);
 			} else {
-				// Xóa sự kiện scroll khi isShow là false
 				window.removeEventListener('scroll', scrollHandler);
 			}
 		});
@@ -59,30 +60,35 @@ export default defineComponent({
 					<header class="">
 						<nav class="navbar navbar-expand-lg">
 							<div class="container">
-								<a class="navbar-brand" href="index.html"><h2>Template <em>Clothing</em></h2></a>
+								<router-link title="Trang chủ" class="navbar-brand" to={'/home'}><h2>Template <em>Clothing</em></h2></router-link>
 								<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
 									<span class="navbar-toggler-icon"></span>
 								</button>
 								<div class="collapse navbar-collapse" id="navbarResponsive">
 									<ul class="navbar-nav ml-auto">
-										<li class="nav-item" role="button" title="home">
-											<router-link to={"/home"} class={{'nav-link' : true,'active' : activeMenu(homeUri)}} id="home">Home</router-link>
+										<li class="nav-item" role="button" title="Sản phẩm">
+											<router-link to={"/products"} class={{'nav-link' : true,'active' : activeMenu(productUri)}} id="product">Sản phẩm</router-link>
 										</li>
-										<li class="nav-item" role="button" title="product">
-											<router-link to={"/products"} class={{'nav-link' : true,'active' : activeMenu(productUri)}} id="product">Product</router-link>
+										<li class="nav-item" role="button" title="Combo">
+											<router-link to={"/combos"} class={{'nav-link' : true,'active' : activeMenu(comboUri)}} id="combo">Combo</router-link>
 										</li>
-										<li class="nav-item" role="button" title="about">
-											<router-link to={"/about"} class={{'nav-link' : true,'active' : activeMenu(aboutUri)}} id="about">About Us</router-link>
+										<li class="nav-item" role="button" title="Đặt lịch">
+											<router-link to={"/bookings"} class={{'nav-link' : true,'active' : activeMenu(bookingUri)}} id="about">Đặt lịch</router-link>
 										</li>
-										<li class="nav-item" role="button" title="contact">
-											<router-link to={"/contact"} class={{'nav-link' : true,'active' : activeMenu(contactUri)}} id="contact">Contact Us</router-link>
+										<li class="nav-item" role="button" title="Tin tức">
+											<router-link to={"/blog"} class={{'nav-link' : true,'active' : activeMenu(newsUri)}} id="contact">Tin tức</router-link>
 										</li>
-										<li class="nav-item" role="button" title="cart">
-											<router-link to={"/cart"} class={{'nav-link' : true,'active' : activeMenu(cartUri)}} id="cart">
-												<i class="bi bi-cart p-1"></i>
-												Cart
-											</router-link>
+										<li class="nav-item" role="button" title="Đăng nhập">
+											<router-link to={"/login"} class={{'nav-link' : true}}>Đăng nhập</router-link>
 										</li>
+										{isLogin() && (
+											<li class="nav-item" role="button" title="Giỏ hàng">
+												<router-link to={"/cart"} className={{'nav-link' : true,'active' : activeMenu(cartUri)}} id="cart">
+													<i class="bi bi-cart p-1"></i>
+													Giỏ hàng
+												</router-link>
+											</li>
+										)}
 									</ul>
 								</div>
 							</div>
@@ -97,18 +103,18 @@ export default defineComponent({
 
 <style lang="css">
 header .navbar {
-	padding: 17px 0px;
+	padding: 17px 0;
 }
 
 .background-header .navbar {
-	padding: 17px 0px;
+	padding: 17px 0;
 }
 
 .background-header {
 	top: 0;
 	position: fixed;
 	background-color: #fff !important;
-	box-shadow: 0px 1px 10px rgba(0, 0, 0, 0.1);
+	box-shadow: 0 1px 10px rgba(0, 0, 0, 0.1);
 }
 
 .background-header .navbar-brand h2 {
@@ -147,7 +153,7 @@ header .navbar {
 }
 
 .navbar .navbar-nav .nav-item {
-	margin: 0px 15px;
+	margin: 0 15px;
 }
 
 .navbar .navbar-nav a.nav-link {
@@ -184,7 +190,7 @@ header .navbar {
 
 @media (max-width: 768px) {
 	.navbar .navbar-nav .nav-item {
-		margin: 0px 5px;
+		margin: 0 5px;
 	}
 }
 </style>
