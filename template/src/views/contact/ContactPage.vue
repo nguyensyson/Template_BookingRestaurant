@@ -3,9 +3,9 @@ import {defineComponent, reactive} from "vue";
 import HeaderComponent from "@/components/header/Header.vue";
 import LoadingButtonComponent from "@/components/button/LoadingButtonComponent.vue";
 import FooterComponent from "@/components/footer/Footer.vue";
-import {QuestionModel} from "@/base/model/QuestionModel";
+import {QuestionModel} from "@/base/model/question.model";
 import LoadingComponent from "@/components/loading/LoadingComponent.vue";
-import {ContactModel} from "@/base/model/ContactModel";
+import {ContactModel} from "@/base/model/contact.model";
 
 export default defineComponent({
 	name: 'ContactPage',

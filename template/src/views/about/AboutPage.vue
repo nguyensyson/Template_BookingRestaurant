@@ -1,7 +1,7 @@
 <script lang="tsx">
 import {defineComponent} from "vue";
 import HeaderComponent from "@/components/header/Header.vue";
-import {TeamManagerModel} from "@/base/model/TeamManagerModel";
+import {TeamManagerModel} from "@/base/model/team-manager.model";
 import FooterComponent from "@/components/footer/Footer.vue";
 import OurCustomerComponent from "@/components/our-customer/OurCustomerComponent.vue";
 import LoadingComponent from "@/components/loading/LoadingComponent.vue";

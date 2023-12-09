@@ -1,5 +1,5 @@
 <script lang="tsx">
-import {defineComponent, ref} from "vue";
+import {defineComponent, reactive} from "vue";
 import HeaderComponent from '@/components/header/Header.vue';
 import FooterComponent from '@/components/footer/Footer.vue';
 import ProductComponent from '@/components/product/ProductComponent.vue';
@@ -8,9 +8,13 @@ import {PRODUCT_RESPONSIVE_CLASS} from "@/plugins/utils";
 import AboutComponent from "@/components/about/AboutComponent.vue";
 import BuyNowComponent from "@/components/buynow/BuyNowComponent.vue";
 import LoadingComponent from "@/components/loading/LoadingComponent.vue";
+import {ProductService} from "@/base/service/product-service";
+import type {ProductModel} from "@/base/model/product.model";
+import {Pageable} from "@/base/model/base.model";
+
 export default defineComponent({
-	name : 'HomePage',
-	components : {
+	name: 'HomePage',
+	components: {
 		HeaderComponent,
 		FooterComponent,
 		ProductComponent,
@@ -19,57 +23,35 @@ export default defineComponent({
 		BuyNowComponent,
 		LoadingComponent
 	},
-	setup(){
-		const products = ref([
-			{
-				name: 'Product 1',
-				price: 100,
-				description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet numquam aspernatur!Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet numquam aspernatur!Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet numquam aspernatur!Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet numquam aspernatur!Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet numquam aspernatur!',
-				imageThumbnail: 'src/assets/images/product_01.jpg',
-				rating: 1,
-				totalReviews: 12,
-			},
-			{
-				name: 'Product 1',
-				price: 100,
-				description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet numquam aspernatur!',
-				imageThumbnail: 'src/assets/images/product_01.jpg',
-				rating: 4,
-				totalReviews: 12,
-			},
-			{
-				name: 'Product 1',
-				price: 100,
-				description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet numquam aspernatur!',
-				imageThumbnail: 'src/assets/images/product_01.jpg',
-				rating: 5,
-				totalReviews: 12,
-			},
-			{
-				name: 'Product 1',
-				price: 100,
-				description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet numquam aspernatur!',
-				imageThumbnail: 'src/assets/images/product_01.jpg',
-				rating: 3,
-				totalReviews: 12,
-			},
-			{
-				name: 'Product 1',
-				price: 100,
-				description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet numquam aspernatur!',
-				imageThumbnail: 'src/assets/images/product_01.jpg',
-				rating: 4,
-				totalReviews: 12,
-			},
-			{
-				name: 'Product 1',
-				price: 100,
-				description: 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet numquam aspernatur!',
-				imageThumbnail: 'src/assets/images/product_01.jpg',
-				rating: 4,
-				totalReviews: 12,
-			}]);
+	setup() {
 		const loadingComponent = <LoadingComponent loading={true}/>
+		let productPage = reactive(new Pageable<ProductModel>());
+		let productList = reactive([] as ProductModel[]);
+		let comboPage = reactive(new Pageable<ProductModel>());
+		let comboList = reactive([] as ProductModel[]);
+		let productService = new ProductService();
+		const findProductPage = () => {
+			productService.findBySearch({}).then((response) => {
+				productPage = response.data;
+				if (productPage.content) {
+					productList = productPage.content;
+				}
+			})
+		}
+
+		const findComboPage = () => {
+			productService.findCombo({
+				name: null as unknown as string,
+			}).then((response) => {
+				comboPage = response.data;
+				if (comboPage.content) {
+					comboList = comboPage.content;
+				}
+			})
+		}
+
+		findProductPage();
+		findComboPage();
 
 		return () => (
 			<div class="container-fluid">
@@ -79,14 +61,30 @@ export default defineComponent({
 				<div class="container ">
 					<div class="col-md-12 mt-3">
 						<div class="section-heading">
-							<h2>Latest Products</h2>
-							<a href="products.html">view all products <i class="fa fa-angle-right"></i></a>
+							<h2>Sản phẩm</h2>
+							<router-link to={'/products'}>Xem tất cả sản phẩm <i class="fa fa-angle-right"></i>
+							</router-link>
 						</div>
 					</div>
 					<div class="row align-items-center">
 						{
-							products.value.map((product, index) => (
+							productList.map((product, index) => (
 								<product-component class={PRODUCT_RESPONSIVE_CLASS.four} product={product} key={index}/>
+							))
+						}
+					</div>
+				</div>
+				<div class="container ">
+					<div class="col-md-12 mt-3">
+						<div class="section-heading">
+							<h2>Combo</h2>
+							<router-link to={"/combos"}>Xem tất cả combo<i class="fa fa-angle-right"></i></router-link>
+						</div>
+					</div>
+					<div class="row align-items-center">
+						{
+							comboList.map((combo, index) => (
+								<product-component className={PRODUCT_RESPONSIVE_CLASS.four} product={combo} key={index}/>
 							))
 						}
 					</div>

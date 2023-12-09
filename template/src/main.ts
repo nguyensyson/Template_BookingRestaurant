@@ -15,6 +15,9 @@ import VueAxios from 'vue-axios'
 import vuetify from '@/plugins/vuetify';
 
 const app = createApp(App)
+
+axios.defaults.baseURL = 'http://localhost:8080/api'
+
 app.use(router)
     .use(vuetify)
     .use(VueAxios, axios)
