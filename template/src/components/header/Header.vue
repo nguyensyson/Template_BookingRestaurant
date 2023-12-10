@@ -76,7 +76,7 @@ export default defineComponent({
 											<router-link to={"/bookings"} class={{'nav-link' : true,'active' : activeMenu(bookingUri)}} id="about">Đặt lịch</router-link>
 										</li>
 										<li class="nav-item" role="button" title="Tin tức">
-											<router-link to={"/blog"} class={{'nav-link' : true,'active' : activeMenu(newsUri)}} id="contact">Tin tức</router-link>
+											<router-link to={"/blogs"} class={{'nav-link' : true,'active' : activeMenu(newsUri)}} id="contact">Tin tức</router-link>
 										</li>
 										<li class="nav-item" role="button" title="Đăng nhập">
 											<router-link to={"/login"} class={{'nav-link' : true}}>Đăng nhập</router-link>
