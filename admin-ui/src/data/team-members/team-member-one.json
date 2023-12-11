@@ -1,0 +1,42 @@
+[
+  {
+    "id": "1",
+    "image": "/assets/img/team/lead.jpg",
+    "fbLink": "//www.facebook.com",
+    "twitterLink": "//www.twitter.com",
+    "instagramLink": "//www.instagram.com",
+    "name": "Nguyễn Sỹ Sơn"
+  },
+  {
+    "id": "2",
+    "image": "/assets/img/team/member.jpg",
+    "fbLink": "//www.facebook.com",
+    "twitterLink": "//www.twitter.com",
+    "instagramLink": "//www.instagram.com",
+    "name": "Đoàn Văn Công"
+  },
+  {
+    "id": "3",
+    "image": "/assets/img/team/member.jpg",
+    "fbLink": "//www.facebook.com",
+    "twitterLink": "//www.twitter.com",
+    "instagramLink": "//www.instagram.com",
+    "name": "Trần Yến My"
+  },
+  {
+    "id": "4",
+    "image": "/assets/img/team/member.jpg",
+    "fbLink": "//www.facebook.com",
+    "twitterLink": "//www.twitter.com",
+    "instagramLink": "//www.instagram.com",
+    "name": "Tạ Thị Linh Nhi"
+  },
+  {
+    "id": "5",
+    "image": "/assets/img/team/member.jpg",
+    "fbLink": "//www.facebook.com",
+    "twitterLink": "//www.twitter.com",
+    "instagramLink": "//www.instagram.com",
+    "name": "Triệu Xuân Hoà"
+  }
+]
