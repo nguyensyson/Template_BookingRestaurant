@@ -43,7 +43,7 @@ export default defineComponent({
 		};
 
 		const isLogin = () => {
-			return localStorage.getItem('token') != null && localStorage.getItem('isLogin') != null && localStorage.getItem('isLogin') == 'true' && localStorage.getItem('user') != null;
+			return localStorage.getItem('token') != null && localStorage.getItem('isLogin') != null && localStorage.getItem('isLogin') == 'true';
 		}
 
 		window.addEventListener('scroll', scrollHandler);
@@ -78,12 +78,16 @@ export default defineComponent({
 										<li class="nav-item" role="button" title="Tin tức">
 											<router-link to={"/blogs"} class={{'nav-link' : true,'active' : activeMenu(newsUri)}} id="contact">Tin tức</router-link>
 										</li>
-										<li class="nav-item" role="button" title="Đăng nhập">
-											<router-link to={"/login"} class={{'nav-link' : true}}>Đăng nhập</router-link>
-										</li>
+										{
+											!isLogin() && (
+												<li class="nav-item" role="button" title="Đăng nhập">
+													<router-link to={"/login"} className={{'nav-link' : true}}>Đăng nhập</router-link>
+												</li>
+											)
+										}
 										{isLogin() && (
 											<li class="nav-item" role="button" title="Giỏ hàng">
-												<router-link to={"/cart"} className={{'nav-link' : true,'active' : activeMenu(cartUri)}} id="cart">
+												<router-link to={"/cart"} class={{'nav-link' : true,'active' : activeMenu(cartUri)}} id="cart">
 													<i class="bi bi-cart p-1"></i>
 													Giỏ hàng
 												</router-link>

@@ -98,11 +98,11 @@ const OrderAdd = () => {
         }}
       >
         <Breadcrumb.Item>Bảng điều khiển</Breadcrumb.Item>
-        <Breadcrumb.Item>Tạo phiếu đặt</Breadcrumb.Item>
+        <Breadcrumb.Item>Chi tiết đơn đặt</Breadcrumb.Item>
       </Breadcrumb>
       <div className="mt-3">
         <Title level={4} className="text-uppercase text-center">
-          Thêm phiếu đặt
+            Chi tiết đơn đặt
         </Title>
         {loading && (
           <div>
