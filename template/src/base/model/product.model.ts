@@ -6,4 +6,5 @@ export class ProductModel {
     imageThumbnail?: string;
     totalReviews?: number;
     rating?: number;
+    quantity?: number;
 }
