@@ -35,6 +35,28 @@ export default defineComponent({
 		},
 		redirectToCheckout() {
 			this.$router.push({name: 'checkout'});
+		},
+		plusQuantity(id: number | undefined) {
+			const cartList = localStorage.getItem('cartList');
+			let cartListParse = cartList ? JSON.parse(cartList) : [];
+			cartListParse.forEach((item: ProductModel) => {
+				if (item.id === id) {
+					item.quantity += 1;
+				}
+			});
+			localStorage.setItem('cartList', JSON.stringify(cartListParse));
+			this.getCartList();
+		},
+		dashQuantity(id: number | undefined) {
+			const cartList = localStorage.getItem('cartList');
+			let cartListParse = cartList ? JSON.parse(cartList) : [];
+			cartListParse.forEach((item: ProductModel) => {
+				if (item.id === id) {
+					item.quantity -= 1;
+				}
+			});
+			localStorage.setItem('cartList', JSON.stringify(cartListParse));
+			this.getCartList();
 		}
 	}
 });
@@ -73,11 +95,11 @@ export default defineComponent({
 											</div>
 											<div class="col-md-3 col-lg-3 col-xl-2 d-flex">
 												<button class="btn btn-link px-2">
-													<i class="bi bi-dash"></i>
+													<i class="bi bi-dash" @click.prevent="dashQuantity(item.id)"></i>
 												</button>
 												<input min="0" name="quantity" :value="item.quantity" type="number" class="form-control form-control-sm"/>
 												<button class="btn btn-link px-2">
-													<i class="bi bi-plus"></i>
+													<i class="bi bi-plus" @click.prevent="plusQuantity(item.id)"></i>
 												</button>
 											</div>
 											<div class="col-md-3 col-lg-2 col-xl-2 offset-lg-1">

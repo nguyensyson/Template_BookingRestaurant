@@ -81,18 +81,16 @@ export default defineComponent({
 										{
 											!isLogin() && (
 												<li class="nav-item" role="button" title="Đăng nhập">
-													<router-link to={"/login"} className={{'nav-link' : true}}>Đăng nhập</router-link>
+													<router-link to={"/login"} class={{'nav-link' : true}}>Đăng nhập</router-link>
 												</li>
 											)
 										}
-										{isLogin() && (
-											<li class="nav-item" role="button" title="Giỏ hàng">
-												<router-link to={"/cart"} class={{'nav-link' : true,'active' : activeMenu(cartUri)}} id="cart">
-													<i class="bi bi-cart p-1"></i>
-													Giỏ hàng
-												</router-link>
-											</li>
-										)}
+										<li class="nav-item" role="button" title="Giỏ hàng">
+											<router-link to={"/cart"} class={{'nav-link' : true,'active' : activeMenu(cartUri)}} id="cart">
+												<i class="bi bi-cart p-1"></i>
+												Giỏ hàng
+											</router-link>
+										</li>
 									</ul>
 								</div>
 							</div>

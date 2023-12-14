@@ -1,3 +1,5 @@
+import type {ProductModel} from "@/base/model/product.model";
+
 export class ReservationRequest {
     id?: number;
     sdt?: string;
@@ -11,6 +13,6 @@ export class ReservationRequest {
     originalPrice?: number;
     actualPrice?: number;
     priceToPay?: number;
-    listPorduct?: any[];
+    listPorduct?: ProductModel[];
     status?: number;
 }

@@ -6,8 +6,8 @@ import BannerComponent from "@/components/banner/BannerComponent.vue";
 import {ReservationRequest} from "@/base/client/request/reservation-request";
 import {ReservationService} from "@/base/service/reservation-service";
 import {CategoryDinningRomService} from "@/base/service/category-dinning-rom.service";
-import type {CategoryDinningRomModel} from "@/base/model/category-dinning-rom.model";
-
+import {CategoryDinningRomModel} from "@/base/model/category-dinning-rom.model";
+import {toast} from "vue3-toastify";
 export default defineComponent({
 	name: 'BookingPage',
 	components: {
@@ -31,8 +31,11 @@ export default defineComponent({
 		},
 		addByUser(status : number) {
 			this.reservationRequest.status = status;
+			const listProduct = localStorage.getItem('cartList');
+			this.reservationRequest.listPorduct = listProduct ? JSON.parse(listProduct) : [];
 			this.reservationService.addByUser(this.reservationRequest).then(res => {
-				console.log(res);
+				toast.success(res?.data);
+				localStorage.removeItem('cartList');
 			})
 		}
 	},
