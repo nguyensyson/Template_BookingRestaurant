@@ -58,6 +58,10 @@ const ProductApi = {
             },
         });
     },
+    getAllByReservationId: (id) => {
+        const url = `/view/product/getAll/${id}`;
+        return axiosClient.get(url);
+    }
 };
 
 export default ProductApi;

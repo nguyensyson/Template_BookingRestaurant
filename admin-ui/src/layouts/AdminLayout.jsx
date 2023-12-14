@@ -259,6 +259,10 @@ const AdminLayout = () => {
                         <Route path="/admin/account-edit/:id" component={UsersEdit}/>
                         {/* Order router */}
                         <Route path="/admin/orders" component={OrderList}/>
+                        <Route
+                            path="/admin/order-detail/:id"
+                            component={OrderAdd}
+                        />
                         <Route path="/admin/orders-pending" component={OrderPending}/>
                         <Route
                             path="/admin/orders-been-confirmed"
@@ -270,10 +274,6 @@ const AdminLayout = () => {
                         />
                         <Route path="/admin/orders-completed" component={OrderCompleted}/>
                         <Route path="/admin/orders-canceled" component={OrderCanceled}/>
-                        <Route
-                            path="/admin/orders-canceled-by-customer"
-                            component={OrderAdd}
-                        />
                         {/* Voucher router */}
                         <Route path="/admin/vouchers" component={VoucherList}/>
                         <Route path="/admin/voucher-add" component={VoucherAdd}/>
