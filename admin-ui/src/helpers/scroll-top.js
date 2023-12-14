@@ -30,7 +30,7 @@ const ScrollToTop = (props) => {
         try {
           const response = await UserApi.RefreshToken({
             userId: user.accountId,
-            token: JSON.parse(userCheckToken),
+            token: userCheckToken,
           });
 
           const expirationTime = new Date().getTime() + 4 * 60 * 60 * 1000;

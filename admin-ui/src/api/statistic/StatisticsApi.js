@@ -7,8 +7,6 @@ const StatisticsApi = {
       headers: {
         Authorization: `Bearer ${
           localStorage.getItem("token")
-            ? JSON.parse(localStorage.getItem("token"))
-            : ""
         }`,
       },
       params: {
@@ -22,8 +20,6 @@ const StatisticsApi = {
       headers: {
         Authorization: `Bearer ${
           localStorage.getItem("token")
-            ? JSON.parse(localStorage.getItem("token"))
-            : ""
         }`,
       },
       params: {
@@ -37,8 +33,6 @@ const StatisticsApi = {
       headers: {
         Authorization: `Bearer ${
           localStorage.getItem("token")
-            ? JSON.parse(localStorage.getItem("token"))
-            : ""
         }`,
       },
       params: {
@@ -52,8 +46,6 @@ const StatisticsApi = {
       headers: {
         Authorization: `Bearer ${
           localStorage.getItem("token")
-            ? JSON.parse(localStorage.getItem("token"))
-            : ""
         }`,
       },
       params: {
@@ -67,8 +59,6 @@ const StatisticsApi = {
       headers: {
         Authorization: `Bearer ${
           localStorage.getItem("token")
-            ? JSON.parse(localStorage.getItem("token"))
-            : ""
         }`,
       },
       params: {
