@@ -8,6 +8,9 @@ import {ReservationService} from "@/base/service/reservation-service";
 import {CategoryDinningRomService} from "@/base/service/category-dinning-rom.service";
 import {CategoryDinningRomModel} from "@/base/model/category-dinning-rom.model";
 import {toast} from "vue3-toastify";
+import type {ProductModel} from "@/base/model/product.model";
+import {formatMoney} from "../../plugins/utils";
+
 export default defineComponent({
 	name: 'BookingPage',
 	components: {
@@ -18,21 +21,27 @@ export default defineComponent({
 	data() {
 		return {
 			categoryDinnerRoom: [] as CategoryDinningRomModel[],
-			reservationRequest : new ReservationRequest(),
-			reservationService : new ReservationService(),
-			categoryDinningRomService : new CategoryDinningRomService()
+			reservationRequest: new ReservationRequest(),
+			reservationService: new ReservationService(),
+			categoryDinningRomService: new CategoryDinningRomService(),
+			productList: [] as ProductModel[],
+			totalPrice : 0 as number
 		}
 	},
 	methods: {
+		formatMoney,
 		getAllDinnerRoom() {
 			this.categoryDinningRomService.getAll().then(res => {
 				this.categoryDinnerRoom = res.data;
 			})
 		},
-		addByUser(status : number) {
+		addByUser(status: number) {
+			if (this.productList?.length === 0) {
+				toast.error('Vui lòng chọn sản phẩm');
+				return;
+			}
 			this.reservationRequest.status = status;
-			const listProduct = localStorage.getItem('cartList');
-			this.reservationRequest.listPorduct = listProduct ? JSON.parse(listProduct) : [];
+			this.reservationRequest.listPorduct = this.productList;
 			this.reservationService.addByUser(this.reservationRequest).then(res => {
 				toast.success(res?.data);
 				localStorage.removeItem('cartList');
@@ -41,6 +50,9 @@ export default defineComponent({
 	},
 	created() {
 		this.getAllDinnerRoom();
+		const listProduct = localStorage.getItem('cartList');
+		this.productList = listProduct ? JSON.parse(listProduct) : [];
+		this.totalPrice = this.productList.reduce((total, item) => total + item?.price * item.quantity, 0);
 	}
 })
 </script>
@@ -75,7 +87,7 @@ export default defineComponent({
 										<v-text-field dataformatas="dd/MM/yyyy HH:mm" type="datetime-local" label="Ngày và giờ check-in" v-model="reservationRequest.dateTime"></v-text-field>
 									</v-col>
 									<v-col cols="12" md="6">
-										<v-text-field label="Số người tham gia"  v-model="reservationRequest.numberOfPeopleBooked"></v-text-field>
+										<v-text-field label="Số người tham gia" v-model="reservationRequest.numberOfPeopleBooked"></v-text-field>
 									</v-col>
 								</v-row>
 								<v-row>
@@ -94,18 +106,23 @@ export default defineComponent({
 									<div class="your-order-top">
 										<ul class="d-flex justify-content-between">
 											<li>Sản Phẩm</li>
-											<li>Tổng số lượng</li>
+											<li>Tổng</li>
 										</ul>
 									</div>
 									<div class="your-order-middle">
-										<ul></ul>
+										<ol>
+											<li v-for="item in productList" class="d-flex justify-content-between">
+												<span class="order-middle-left">{{item.name}} x {{item.quantity}}</span>
+												<span class="order-price">{{formatMoney(item.price * item.quantity)}} VND</span>
+											</li>
+										</ol>
 									</div>
 									<div class="your-order-total">
 										<ul>
 											<li class="order-total">Tổng cộng</li>
 											<li>
 												<div style="display: none;">00</div>
-												0 VND
+												{{totalPrice}} VND
 											</li>
 										</ul>
 									</div>
@@ -119,7 +136,7 @@ export default defineComponent({
 									<p>Nhập mã giảm giá của bạn (nếu có).</p>
 									<v-row>
 										<v-col cols="12">
-											<v-text-field  v-model="reservationRequest.idVoucher" label="Mã giảm giá" outlined dense></v-text-field>
+											<v-text-field v-model="reservationRequest.idVoucher" label="Mã giảm giá" outlined dense></v-text-field>
 										</v-col>
 									</v-row>
 								</div>
@@ -161,6 +178,7 @@ $xxs-layout: "only screen and (min-width: 320px) and (max-width: 479px)";
 
 		color: #000;
 	}
+
 	.billing-info,
 	.billing-select {
 		label {
@@ -168,6 +186,7 @@ $xxs-layout: "only screen and (min-width: 320px) and (max-width: 479px)";
 
 			color: #000;
 		}
+
 		input {
 			font-size: 14px;
 
@@ -178,10 +197,12 @@ $xxs-layout: "only screen and (min-width: 320px) and (max-width: 479px)";
 			border: 1px solid #e6e6e6;
 			background: transparent none repeat scroll 0 0;
 		}
+
 		input.billing-address {
 			margin-bottom: 10px;
 		}
 	}
+
 	.billing-select {
 		select {
 			font-size: 14px;
@@ -193,9 +214,11 @@ $xxs-layout: "only screen and (min-width: 320px) and (max-width: 479px)";
 			border: 1px solid #e6e6e6;
 		}
 	}
+
 	.checkout-account {
 		display: flex;
 		align-items: center;
+
 		input {
 			display: inline-block;
 			float: left;
@@ -205,6 +228,7 @@ $xxs-layout: "only screen and (min-width: 320px) and (max-width: 479px)";
 
 			border: 1px solid #9fa0a2;
 		}
+
 		span {
 			font-weight: 400;
 
@@ -213,6 +237,7 @@ $xxs-layout: "only screen and (min-width: 320px) and (max-width: 479px)";
 			color: #333;
 		}
 	}
+
 	.checkout-account-toggle {
 		input {
 			font-size: 14px;
@@ -225,6 +250,7 @@ $xxs-layout: "only screen and (min-width: 320px) and (max-width: 479px)";
 			border: 1px solid #e6e6e6;
 			background: transparent none repeat scroll 0 0;
 		}
+
 		button.checkout-btn {
 			font-weight: 500;
 
@@ -239,16 +265,19 @@ $xxs-layout: "only screen and (min-width: 320px) and (max-width: 479px)";
 			border: medium none;
 			border-radius: 50px;
 			background-color: #f58634;
+
 			&:hover {
 				background-color: #333;
 			}
 		}
 	}
+
 	.additional-info-wrap {
 		h4 {
 			font-size: 16px;
 			font-weight: 500;
 		}
+
 		.additional-info {
 			label {
 				font-size: 14px;
@@ -257,6 +286,7 @@ $xxs-layout: "only screen and (min-width: 320px) and (max-width: 479px)";
 
 				color: #333;
 			}
+
 			textarea {
 				font-size: 14px;
 
@@ -269,6 +299,7 @@ $xxs-layout: "only screen and (min-width: 320px) and (max-width: 479px)";
 			}
 		}
 	}
+
 	.different-address {
 		display: none;
 	}
@@ -281,6 +312,7 @@ $xxs-layout: "only screen and (min-width: 320px) and (max-width: 479px)";
 	@media #{$xs-layout} {
 		margin-top: 30px;
 	}
+
 	h3 {
 		font-size: 20px;
 		font-weight: 500;
@@ -289,6 +321,7 @@ $xxs-layout: "only screen and (min-width: 320px) and (max-width: 479px)";
 
 		color: #000;
 	}
+
 	.your-order-wrap {
 		padding: 38px 45px 44px;
 
@@ -299,11 +332,13 @@ $xxs-layout: "only screen and (min-width: 320px) and (max-width: 479px)";
 		@media #{$xs-layout} {
 			padding: 30px 20px 36px;
 		}
+
 		.your-order-product-info {
 			.your-order-top {
 				ul {
 					display: flex;
 					justify-content: space-between;
+
 					li {
 						font-size: 16px;
 						font-weight: 500;
@@ -312,12 +347,14 @@ $xxs-layout: "only screen and (min-width: 320px) and (max-width: 479px)";
 					}
 				}
 			}
+
 			.your-order-middle {
 				margin: 29px 0;
 				padding: 19px 0 18px;
 
 				border-top: 1px solid #dee0e4;
 				border-bottom: 1px solid #dee0e4;
+
 				ul {
 					li {
 						display: flex;
@@ -327,17 +364,20 @@ $xxs-layout: "only screen and (min-width: 320px) and (max-width: 479px)";
 					}
 				}
 			}
+
 			.your-order-bottom {
 				ul {
 					display: flex;
 					align-items: center;
 					justify-content: space-between;
+
 					li {
 						font-size: 14px;
 						font-weight: 400;
 
 						list-style: none;
 					}
+
 					li.your-order-shipping {
 						font-size: 16px;
 						font-weight: 400;
@@ -346,22 +386,26 @@ $xxs-layout: "only screen and (min-width: 320px) and (max-width: 479px)";
 					}
 				}
 			}
+
 			.your-order-total {
 				margin: 18px 0 33px;
 				padding: 17px 0 19px;
 
 				border-top: 1px solid #dee0e4;
 				border-bottom: 1px solid #dee0e4;
+
 				ul {
 					display: flex;
 					align-items: center;
 					justify-content: space-between;
+
 					li.order-total {
 						font-size: 18px;
 						font-weight: 500;
 
 						color: #212121;
 					}
+
 					li {
 						font-size: 16px;
 						font-weight: 500;
@@ -374,30 +418,37 @@ $xxs-layout: "only screen and (min-width: 320px) and (max-width: 479px)";
 			}
 		}
 	}
+
 	.payment-accordion {
 		margin: 0 0 16px;
+
 		&:last-child {
 			margin: 0 0 0;
 		}
+
 		h4 {
 			font-size: 16px;
 
 			margin: 0;
 
 			color: #212121;
+
 			a {
 				position: relative;
 
 				display: block;
 
 				color: #212121;
+
 				&:hover {
 					color: #f58634;
 				}
 			}
 		}
+
 		.panel-body {
 			padding: 5px 0 0 0;
+
 			p {
 				font-size: 14px;
 
@@ -407,6 +458,7 @@ $xxs-layout: "only screen and (min-width: 320px) and (max-width: 479px)";
 			}
 		}
 	}
+
 	.place-order > a,
 	.place-order > button {
 		font-weight: 500;
@@ -428,6 +480,7 @@ $xxs-layout: "only screen and (min-width: 320px) and (max-width: 479px)";
 		border-radius: 50px;
 		background: none;
 		background-color: #f58634;
+
 		&:hover {
 			background-color: #333;
 		}

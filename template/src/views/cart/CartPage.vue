@@ -3,7 +3,7 @@ import {defineComponent} from "vue";
 import HeaderComponent from "@/components/header/Header.vue";
 import FooterComponent from "@/components/footer/Footer.vue";
 import type {ProductModel} from "@/base/model/product.model";
-import {formatMoney} from "../../plugins/utils";
+import {formatMoney} from "@/plugins/utils";
 
 export default defineComponent({
 	name: 'CartPage',
@@ -34,7 +34,7 @@ export default defineComponent({
 			this.getCartList();
 		},
 		redirectToCheckout() {
-			this.$router.push({name: 'checkout'});
+			this.$router.push('/bookings');
 		},
 		plusQuantity(id: number | undefined) {
 			const cartList = localStorage.getItem('cartList');
