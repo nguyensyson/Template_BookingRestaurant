@@ -10,6 +10,30 @@ const ReservationApi = {
                 }`,
             },
         });
+    },
+    updateByAdmin(body, id) {
+        const uri = '/admin/reservation/updateByadmin/' + id;
+        return axiosClient.put(uri, body, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+            }
+        });
+    },
+    changeProduct (body,id) {
+        const uri = '/user/reservation/change-product/' + id;
+        return axiosClient.put(uri, body, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+            }
+        });
+    },
+    changeStatus (body,id) {
+        const uri = '/user/reservation/change-status/' + id;
+        return axiosClient.put(uri, body, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+            }
+        });
     }
 }
 
