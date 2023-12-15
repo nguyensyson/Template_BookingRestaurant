@@ -25,12 +25,23 @@ const OrderAdd = () => {
     // danh sách món ăn
     const [productList, setProductList] = useState([]);
     const [checkBoxDataList, setCheckBoxDataList] = useState([]);
+    const [checkBoxProductDataList, setCheckBoxProductDataList] = useState([]);
+    const [status, setStatus] = useState(0);
 
     const handleCheckBoxChange = (e) => {
         if (e.target.checked) {
             setCheckBoxDataList([...checkBoxDataList, +e.target.value]);
         } else {
             setCheckBoxDataList(checkBoxDataList.filter((item) => item !== +e.target.value));
+        }
+    }
+
+    const handleCheckBoxProductChange = (e) => {
+        const productIsOrdered = dataProduct.filter((item) => item.isOrdered === true).map((item) => item.id);
+        if (e.target.checked) {
+            setCheckBoxProductDataList([...checkBoxProductDataList, ...productIsOrdered, +e.target.value]);
+        } else {
+            setCheckBoxProductDataList(checkBoxProductDataList.filter((item) => item !== +e.target.value));
         }
     }
 
@@ -67,15 +78,15 @@ const OrderAdd = () => {
     const dataProduct = productList.map((item, index) => ({
         id: item?.id,
         key: index,
-        name : item?.name,
-        price : item?.price,
-        isOrdered : item?.isOrdered,
+        name: item?.name,
+        price: item?.price,
+        quantity: item?.quantity,
+        isOrdered: item?.isOrdered,
     }));
 
     const handleOnChangeRoom = async (value) => {
         try {
             const res = await DinnerTableApi.getAllByDiningRoomId(value);
-            console.log(res)
             setTableList(res);
         } catch (error) {
             console.error("Lỗi khi tải danh sách bàn ăn:", error);
@@ -109,12 +120,42 @@ const OrderAdd = () => {
         }
     ];
 
+    const handleChangeQuantity = (e, record) => {
+        productList.forEach((item) => {
+            if (item.id === record.id) {
+                item.quantity = +e.target.value;
+                record.quantity = +e.target.value;
+            }
+        });
+    }
+    const button = (status, f) => {
+        if (status === 1) {
+            return <Button type="primary" htmlType="submit" onClick={f} block>Xác nhận đơn</Button>
+        } else if (status === 2) {
+            return <Button type="primary" htmlType="submit" onClick={f} block>Check-in</Button>
+        } else if (status === 3) {
+            return <Button type="primary" htmlType="submit" onClick={f} block>Thanh toán</Button>
+        } else {
+            return (
+                <></>
+            )
+        }
+    }
+
     const tableProductColumns = [
         {
             title: "",
             dataIndex: "id",
             key: "id",
-            render: (id ,record) => <input type="checkbox" value={id} width="30px" onChange={handleCheckBoxChange} checked={record?.isOrdered}/>,
+            render: (id, record) => (
+                <input
+                    type="checkbox"
+                    value={id}
+                    width="30px"
+                    onChange={handleCheckBoxProductChange}
+                    defaultChecked={record?.isOrdered}
+                />
+            ),
         },
         {
             title: "Món ăn",
@@ -127,6 +168,17 @@ const OrderAdd = () => {
             dataIndex: "price",
             key: "price",
             render: (text) => <a>{text}</a>,
+        },
+        {
+            title: "Số lượng",
+            dataIndex: "quantity",
+            key: "quantity",
+            render: (text, record) => (
+                <div>
+                    <input type="number" defaultValue={text} width="30px"
+                           onChange={(event) => handleChangeQuantity(event, record)}/>
+                </div>
+            ),
         }
     ];
 
@@ -142,8 +194,8 @@ const OrderAdd = () => {
                     fullNameClient: orderDetail?.fullNameClient,
                     numberOfPeopleBooked: orderDetail?.numberOfPeopleBooked,
                     reservationDate: moment(orderDetail?.reservationDate),
-                    // Các trường khác...
                 });
+                setStatus(orderDetail?.status?.id);
                 setLoading(false);
             } catch (error) {
                 setLoading(false);
@@ -173,8 +225,27 @@ const OrderAdd = () => {
     }, [id, form]);
 
     const onHandleSubmit = () => {
-        // Xử lý submit form
-        // ...
+        const payload = {
+            numberOfPeopleBooked: form.getFieldValue("numberOfPeopleBooked"),
+            status : status
+        }
+        ReservationApi.changeStatus(payload, id).then((res) => {
+            alert(res);
+        });
+    };
+
+    const onChangeProduct = () => {
+        const productSelected = productList.filter((item) => checkBoxProductDataList.includes(item.id));
+        const productIsOrdered = dataProduct.filter((item) => item.isOrdered === true).map((item) => item);
+        const payload = {
+            listPorduct: [...productIsOrdered, ...productSelected],
+            originalPrice: productSelected.reduce((total, item) => total + item.price * item.quantity, 0),
+            actualPrice: productSelected.reduce((total, item) => total + item.price * item.quantity, 0),
+            priceToPay: productSelected.reduce((total, item) => total + item.price * item.quantity, 0),
+        }
+        ReservationApi.changeProduct(payload, id).then((res) => {
+            alert(res);
+        });
     };
 
     return (
@@ -331,11 +402,13 @@ const OrderAdd = () => {
                                 tooltip="bàn ăn"
                                 rules={[{required: true}]}
                             >
-                                <Table dataSource={dataDinnerTable} columns={tableColumns}/>;
+                                <Table dataSource={dataDinnerTable} columns={tableColumns}/>
                             </Form.Item>
                         </div>
                         <div className={`col-12 d-flex justify-content-center`}>
-                            <button className={`btn btn-primary`} onClick={arrangeSeats}>Sắp xếp chỗ ngồi</button>
+                            <button type={`button`} className={`btn btn-primary`} onClick={arrangeSeats}>Sắp xếp chỗ
+                                ngồi
+                            </button>
                         </div>
                         <div className="col-12 mb-3">
                             <Form.Item
@@ -345,20 +418,19 @@ const OrderAdd = () => {
                                 tooltip="món ăn"
                                 rules={[{required: true}]}
                             >
-                                <Table dataSource={dataProduct} columns={tableProductColumns}/>;
+                                <Table dataSource={dataProduct} columns={tableProductColumns}/>
                             </Form.Item>
+                            <div className={`col-12 d-flex justify-content-center`}>
+                                <button type={`button`} className={`btn btn-primary`} onClick={onChangeProduct}>Thêm
+                                    món
+                                </button>
+                            </div>
                         </div>
+
                     </div>
 
                     <Form.Item wrapperCol={{span: 16, offset: 4}}>
-                        <Button
-                            type="primary"
-                            htmlType="submit"
-                            onClick={onHandleSubmit}
-                            block
-                        >
-                            Thêm mới phiếu đặt
-                        </Button>
+                        {button(status, onHandleSubmit)}
                     </Form.Item>
                 </Form>
             </div>
