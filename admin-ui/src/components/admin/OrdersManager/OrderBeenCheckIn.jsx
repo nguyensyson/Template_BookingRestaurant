@@ -17,7 +17,7 @@ import LoadingSpin from "../../loading/LoadingSpin.jsx";
 import Bill from "../../../pages/other/Bill.jsx";
 import PrintButton from "../../../pages/other/PrintButton.jsx";
 
-const OrderCanceled = () => {
+const OrderBeenCheckIn = () => {
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
@@ -76,7 +76,7 @@ const OrderCanceled = () => {
     page: 0,
     pageSize: 10,
     sortBy: "",
-    statusID: 5,
+    statusID: 3,
   });
 
   useEffect(() => {
@@ -364,4 +364,4 @@ const OrderCanceled = () => {
   );
 };
 
-export default OrderCanceled;
+export default OrderBeenCheckIn;

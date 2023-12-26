@@ -31,5 +31,8 @@ export default defineConfig({
         },
         assetsDir: 'assets',
         cssCodeSplit: true
-    }
-})
+    },
+    server: {
+        port: 3333,
+    },
+});

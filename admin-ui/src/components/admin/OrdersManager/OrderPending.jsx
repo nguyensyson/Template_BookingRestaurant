@@ -1,23 +1,19 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Breadcrumb,
+  Button,
+  Descriptions,
+  Image,
+  message,
+  Modal,
   Pagination,
   Space,
   Table,
-  Select,
   Tag,
-  Button,
-  message,
-  Modal,
-  Descriptions,
-  Image,
 } from "antd";
 import OrderApi from "../../../api/order/OrderApi.js";
 import { format } from "date-fns";
-import LoadingSpin from "../../loading/LoadingSpin";
-import { useHistory } from "react-router-dom/cjs/react-router-dom.min.js";
-import Swal from "sweetalert2";
-import { useRef } from "react";
+import LoadingSpin from "../../loading/LoadingSpin.jsx";
 import Bill from "../../../pages/other/Bill.jsx";
 import PrintButton from "../../../pages/other/PrintButton.jsx";
 
@@ -25,179 +21,129 @@ const OrderPending = () => {
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
-  const history = useHistory();
   const invoiceRef = useRef(null);
+  const [currentOrderDetail, setCurrentOrderDetail] = useState([]);
+  const [currentData, setCurrentData] = useState({});
   const [isModal, setIsModal] = useState(false);
-  const [currenOrderDeatail, setCurrenOrderDeatail] = useState([]);
-  const [curentInfo, setCurenInfo] = useState({});
-  const [dataCurrent, setDataCurrent] = useState({});
-  const handleCancelBill = () => {
-    setIsModal(false);
-  };
-  const [data, setData] = useState({
-    totalItems: 0,
+  const [currentInfo, setCurrentInfo] = useState({});
+  const [tableData, setTableData] = useState({
+    content: [],
+    empty: true,
+    first: true,
+    last: true,
+    number: 0,
+    numberOfElements: 0,
+    pageable: {
+      offset: 0,
+      pageNumber: 0,
+      pageSize: 0,
+    },
+    size: 0,
+    sort: {
+      empty: true,
+      sorted: true,
+    },
+    totalElements: 0,
     totalPages: 0,
-    page: 1,
-    pageSize: 10,
-    hasPrevious: false,
-    hasNext: true,
-    data: [],
   });
-  const showModal = (id) => {
-    const dataOrderCurrent = data.data.filter((x) => x.orderId === id)[0];
-    setDataCurrent(dataOrderCurrent);
-    setCurenInfo({
-      address: dataOrderCurrent.address,
-      phone: dataOrderCurrent.phone,
-      paymentOrder:
-        dataCurrent.paymentOrderPaymentId === 1
-          ? "Thanh Toán Khi Nhận Hàng"
-          : "Thanh Toán Online",
-      noteOrder: dataOrderCurrent.noteOrder,
-      imageComplete: dataOrderCurrent.imageComplete,
-      orderStatus: dataOrderCurrent.orderStatus.name,
-      actualPrice: dataOrderCurrent.actualPrice,
-      paymentId: dataOrderCurrent.paymentId,
-      fullName: dataOrderCurrent.fullName,
-      email: dataOrderCurrent.address,
-      createdAt: dataOrderCurrent.createdAt,
-      codeOrder: dataOrderCurrent.codeOrder,
-    });
-    setCurrenOrderDeatail(
-      dataOrderCurrent.orderDetails.map((item, index) => {
-        return {
-          productId: index + 1,
-          nameProduct: item.product.nameProduct,
-          avartarImageProduct: item.product.avartarImageProduct,
-          quantity: item.quantity,
-          priceOld: item.product.price.toLocaleString("vi-VN") + " " + "vnd",
-          price: item.price.toLocaleString("vi-VN") + " " + "VND",
-          totalPrice:
-            (item.price * item.quantity).toLocaleString("vi-VN") + " " + "VND",
-        };
-      })
-    );
-    setIsModalOpen(true);
+
+  const redirectOrder = (id) => {
+    //redirect to order detail
+    window.location.href = `/admin/order-detail/${id}`;
   };
+
   const handleOk = () => {
     setIsModalOpen(false);
   };
+
+  const handleCancelBill = () => {
+    setIsModal(false);
+  };
+
   const handleCancel = () => {
     setIsModalOpen(false);
   };
+
   const handlePaginationChange = (page, pageSize) => {
-    setParam(
-      (prev) =>
-        (prev = {
-          ...param,
-          page: page,
-          pageSize: pageSize,
-        })
-    );
+    setParam((prev) => ({
+      ...prev,
+      page: page,
+      pageSize: pageSize,
+    }));
   };
+
   const [param, setParam] = useState({
-    page: 1,
+    page: 0,
     pageSize: 10,
-    search: "",
-  });
-  useEffect(() => {
-    const getOrders = async () => {
-      try {
-        setLoading(true);
-        const { data } = await OrderApi.GetWaitingorder(param);
-        setData(data);
-        setLoading(false);
-      } catch (error) {
-        setLoading(false);
-      }
-    };
-    getOrders();
-  }, [param]);
-  const dataSource = data.data?.map((item, index) => {
-    return {
-      key: index + 1,
-      orderId: item.orderId,
-      code: item.codeOrder,
-      fullName: item.fullName,
-      createdAt: item.createdAt,
-      paymentOrder:
-        item.paymentOrderPaymentId == 1 ? (
-          <Tag color="cyan">Thanh toàn khi nhận hàng</Tag>
-        ) : (
-          <Tag color="green">Thanh toán online</Tag>
-        ),
-      orderStatus: item.orderStatus,
-    };
+    sortBy: "",
+    statusID: 1,
   });
 
-  const [options, setOptions] = useState([]);
   useEffect(() => {
-    getStatus();
-  }, []);
-  const getStatus = async () => {
-    try {
-      const data = await OrderApi.getOrderStatus();
-      const excludedStatusIds = [9, 5, 12];
-      const filteredOrderStatuses = data.filter(
-        (orderStatus) => !excludedStatusIds.includes(orderStatus.orderStatusId)
-      );
-      setOptions(filteredOrderStatuses);
-    } catch (error) {}
-  };
-  const handleChangeStatus = (id) => async (orderId, newStatus) => {
-    try {
-      setLoading(true);
-      const confirmResult = await Swal.fire({
-        title: "Xác nhận thay đổi trạng thái?",
-        text: "Bạn có chắc muốn thay đổi trạng thái này?",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        cancelButtonText: "Không",
-        confirmButtonText: "Chắc chắn rồi!",
-      });
-      if (confirmResult.isConfirmed) {
-        await OrderApi.updateOrderStatus({
-          id: id.orderId,
-          idStatus: newStatus.value,
+    let isMounted = true;
+    const getOrders = () => {
+      try {
+        setLoading(true);
+        OrderApi.getByStatus(param).then((response) => {
+          if (isMounted) {
+            // Kiểm tra xem response có chứa dữ liệu hợp lệ không
+            setTableData(response);
+            setLoading(false);
+            console.log("Danh sách đơn hàng:", tableData);
+          }
         });
-        messageApi.open({
-          type: "success",
-          content: "Thay đổi trạng thái thành công",
-        });
-        setLoading(false);
-        setTimeout(() => {
-          history.go(0);
-        }, 200);
-        return;
-      } else {
-        setLoading(false);
-        return;
+      } catch (error) {
+        console.error("Lỗi khi tải đơn hàng:", error);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
-    } catch (error) {
-      messageApi.open({
-        type: "error",
-        content: "Thay đổi trạng thái thất bại",
-      });
-      return;
-    }
-  };
+    };
+
+    getOrders();
+
+    // Cleanup function
+    return () => {
+      isMounted = false;
+    };
+  }, [param]);
+  const dataSource = tableData.content?.map((item, index) => ({
+    id: item.id,
+    key: index + 1,
+    orderId: item.orderId,
+    sdt: item.sdt,
+    fullname: item.fullname,
+    reservationDate: item.reservationDate,
+    // paymentOrder:
+    //   item.paymentOrderPaymentId == 1 ? (
+    //     <Tag color="cyan">Thanh toàn tại nhà hàng</Tag>
+    //   ) : (
+    //     <Tag color="green">Thanh toán online</Tag>
+    //   ),
+    orderStatus: item.oderStatus,
+  }));
+
+  const [options, setOptions] = useState([]);
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 4:
+      case 1:
         return "#70a1ff";
-      case 5:
+      case 2:
         return "#2ed573";
-      case 7:
+      case 3:
         return "#ff4757";
-      case 9:
+      case 4:
         return "#ffa502";
-      case 15:
+      case 5:
+        return "#EE3B3B";
+      case 6:
         return "#00FA9A";
+      default:
+        return "#000000";
     }
   };
+
   const columns = [
     {
       title: "STT",
@@ -206,76 +152,62 @@ const OrderPending = () => {
       align: "center",
     },
     {
-      title: "Mã đơn hàng",
-      dataIndex: "code",
-      key: "code",
-      align: "center",
-    },
-    {
       title: "Tên khách hàng",
-      dataIndex: "fullName",
-      key: "fullName",
+      dataIndex: "fullname",
+      key: "fullname",
       align: "center",
+      render: (fullname) => <b>{fullname}</b>,
     },
-
     {
-      title: "Ngày đặt hàng",
-      dataIndex: "createdAt",
-      key: "createdAt",
+      title: "SDT",
+      dataIndex: "sdt",
+      key: "sdt",
       align: "center",
-      render: (createdAt) => (
-        <>{format(new Date(createdAt), "HH:mm:ss dd/MM/yyyy")}</>
+      render: (sdt) => <b>{sdt}</b>,
+    },
+    {
+      title: "Ngày đặt",
+      dataIndex: "reservationDate",
+      key: "reservationDate",
+      align: "center",
+      render: (reservationDate) => (
+        <>{format(new Date(reservationDate), "HH:mm:ss dd/MM/yyyy")}</>
       ),
     },
-    {
-      title: "Phương thức thanh toàn",
-      dataIndex: "paymentOrder",
-      key: "paymentOrder",
-      align: "center",
-    },
+    // {
+    //   title: "Phương thức thanh toán",
+    //   dataIndex: "paymentOrder",
+    //   key: "paymentOrder",
+    //   align: "center",
+    // },
     {
       title: "Trạng thái đơn hàng",
       dataIndex: "orderStatus",
       key: "orderStatus",
       align: "center",
-      render: (orderStatus, orderId) => (
-        <Select
-          value={orderStatus.orderStatusId}
-          onChange={handleChangeStatus(orderId)}
-          style={{ width: 140 }}>
-          {options &&
-            options.map((item) => {
-              return (
-                <Select.Option
-                  key={item.orderStatusId}
-                  value={item.orderStatusId}>
-                  <p
-                    style={{
-                      color: getStatusColor(item.orderStatusId),
-                    }}>
-                    {item.name}
-                  </p>
-                </Select.Option>
-              );
-            })}
-        </Select>
+      render: (orderStatus) => (
+        <p style={{ color: getStatusColor(orderStatus?.id) }}>
+          {orderStatus?.title}
+          {/* Chờ xác nhận */}
+        </p>
       ),
     },
     {
       title: "Xem chi tiết",
-      dataIndex: "orderId",
-      key: "orderId",
+      dataIndex: "id",
+      key: "id",
       align: "center",
-      render: (orderId) => (
+      render: (id) => (
         <Space size="middle">
-          <Button type="primary" onClick={(e) => showModal(orderId)}>
+          <Button type="primary" onClick={(e) => redirectOrder(id)}>
             Chi tiết
           </Button>
         </Space>
       ),
     },
   ];
-  const columnDeatail = [
+
+  const columnDetail = [
     {
       title: "STT",
       dataIndex: "productId",
@@ -329,52 +261,50 @@ const OrderPending = () => {
       align: "center",
     },
   ];
+
   return (
     <>
-      <Breadcrumb
-        style={{
-          margin: "16px 0",
-        }}>
+      <Breadcrumb style={{ margin: "16px 0" }}>
         <Breadcrumb.Item>Bảng điều khiển</Breadcrumb.Item>
-        <Breadcrumb.Item>Đơn hàng đang chờ</Breadcrumb.Item>
+        <Breadcrumb.Item>Danh sách đơn hàng</Breadcrumb.Item>
       </Breadcrumb>
       {contextHolder}
       <Modal
-        // title="Basic Modal"
         open={isModalOpen}
         width={1100}
         onOk={handleOk}
-        onCancel={handleCancel}>
+        onCancel={handleCancel}
+      >
         <Descriptions title="Chi tiết đơn hàng">
           <Descriptions.Item label="Tên khách hàng">
-            {dataCurrent && dataCurrent.fullName}
+            {currentData && currentData.fullName}
           </Descriptions.Item>
           <Descriptions.Item label="Số điện thoại">
-            {dataCurrent && dataCurrent.phone}
+            {currentData && currentData.phone}
           </Descriptions.Item>
           <Descriptions.Item label="Mã đơn hàng">
-            {dataCurrent && dataCurrent.codeOrder}
+            {currentData && currentData.codeOrder}
           </Descriptions.Item>
           <Descriptions.Item label="Email">
-            {dataCurrent && dataCurrent.email}
+            {currentData && currentData.email}
           </Descriptions.Item>
           <Descriptions.Item label="Địa chỉ">
-            {dataCurrent && dataCurrent.address}
+            {currentData && currentData.address}
           </Descriptions.Item>
           <Descriptions.Item label="Tổng đơn hàng">
-            {" "}
-            {dataCurrent &&
-              dataCurrent.actualPrice &&
-              dataCurrent.actualPrice.toLocaleString("vi-VN")}{" "}
-            VND
+            {currentData &&
+              currentData.actualPrice &&
+              currentData.actualPrice.toLocaleString("vi-VN")}{" "}
+            VNĐ
           </Descriptions.Item>
           <Descriptions.Item label="Phương thức thanh toán">
-            {dataCurrent && (
+            {currentData && (
               <Tag
                 color={
-                  dataCurrent.paymentOrderPaymentId === 1 ? "cyan" : "green"
-                }>
-                {dataCurrent.paymentOrderPaymentId === 1
+                  currentData.paymentOrderPaymentId === 1 ? "cyan" : "green"
+                }
+              >
+                {currentData.paymentOrderPaymentId === 1
                   ? "Thanh Toán Khi Nhận Hàng"
                   : "Thanh Toán Online"}
               </Tag>
@@ -386,22 +316,24 @@ const OrderPending = () => {
               type="primary"
               onClick={() => {
                 setIsModal(true);
-              }}>
+              }}
+            >
               In hóa đơn
             </Button>
           </Descriptions.Item>
         </Descriptions>
-        <Table columns={columnDeatail} dataSource={currenOrderDeatail} />
+        <Table columns={columnDetail} dataSource={currentOrderDetail} />
       </Modal>
       <Modal
         title="Hóa đơn chi tiết"
         open={isModal}
         width={829}
         onCancel={handleCancelBill}
-        footer={null}>
+        footer={null}
+      >
         <Bill
-          curentInfo={curentInfo}
-          currenOrderDeatail={currenOrderDeatail}
+          curentInfo={currentInfo}
+          currenOrderDeatail={currentOrderDetail}
           ref={invoiceRef}
         />
         <PrintButton invoiceRef={invoiceRef} />
@@ -412,18 +344,20 @@ const OrderPending = () => {
             <LoadingSpin />
           </div>
         )}
-        <Table dataSource={dataSource} columns={columns} pagination={false} />
+        {tableData.content && (
+          <Table dataSource={dataSource} columns={columns} pagination={false} />
+        )}
         <Pagination
           style={{
             textAlign: "right",
             padding: "10px 20px",
           }}
-          current={data.page}
-          pageSize={data.pageSize}
-          total={data.totalItems}
+          current={tableData.page}
+          pageSize={tableData.pageSize}
+          total={tableData.totalElements}
           onChange={handlePaginationChange}
           showSizeChanger
-          showTotal={(total) => `Tổng ${total} đơn hàng đang chờ`}
+          showTotal={(total) => `Tổng ${total} đơn hàng`}
         />
       </div>
     </>

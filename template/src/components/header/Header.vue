@@ -60,7 +60,7 @@ export default defineComponent({
 					<header class="">
 						<nav class="navbar navbar-expand-lg">
 							<div class="container">
-								<router-link title="Trang chủ" class="navbar-brand" to={'/home'}><h2>Template <em>Clothing</em></h2></router-link>
+								<router-link title="Trang chủ" class="navbar-brand" to={'/home'}><h2>Bees<em>Meal</em></h2></router-link>
 								<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
 									<span class="navbar-toggler-icon"></span>
 								</button>
@@ -79,7 +79,7 @@ export default defineComponent({
 											<router-link to={"/blogs"} class={{'nav-link' : true,'active' : activeMenu(newsUri)}} id="contact">Tin tức</router-link>
 										</li>
 										{
-											!isLogin() && (
+											(
 												<li class="nav-item" role="button" title="Đăng nhập">
 													<router-link to={"/login"} class={{'nav-link' : true}}>Đăng nhập</router-link>
 												</li>

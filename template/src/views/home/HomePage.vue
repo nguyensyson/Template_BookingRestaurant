@@ -31,7 +31,10 @@ export default defineComponent({
 		let comboList = reactive([] as ProductModel[]);
 		let productService = new ProductService();
 		const findProductPage = () => {
-			productService.findBySearch({}).then((response) => {
+			productService.findBySearch({
+				page: 0,
+				size: 6
+			}).then((response) => {
 				productPage = response.data;
 				if (productPage.content) {
 					productList = productPage.content;
@@ -41,6 +44,8 @@ export default defineComponent({
 
 		const findComboPage = () => {
 			productService.findCombo({
+				page: 0,
+				size: 6,
 				name: null as unknown as string,
 			}).then((response) => {
 				comboPage = response.data;
@@ -82,15 +87,10 @@ export default defineComponent({
 						</div>
 					</div>
 					<div class="row align-items-center">
-						{
-							comboList.map((combo, index) => (
-								<product-component className={PRODUCT_RESPONSIVE_CLASS.four} product={combo} key={index}/>
-							))
-						}
+						
 					</div>
 				</div>
-				<about-component/>
-				<buy-now-component/>
+				
 				<footer-component/>
 			</div>
 		)

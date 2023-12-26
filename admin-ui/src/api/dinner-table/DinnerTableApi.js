@@ -1,8 +1,8 @@
 import axiosClient from "../AxiosClient";
 
 const DinnerTableApi = {
-    getAllByDiningRoomId: async (diningRoomId) => {
-        const url = `/view/dinner-table/findByDinningRoomId/${diningRoomId}`;
+    getAllByDiningRoomId: async (id, diningRoomId) => {
+        const url = `/view/dinner-table/findByDinningRoomId/${id}/${diningRoomId}`;
         return axiosClient.get(url);
     }
 }

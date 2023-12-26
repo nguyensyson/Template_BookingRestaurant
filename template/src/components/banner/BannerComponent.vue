@@ -16,6 +16,7 @@ export default defineComponent({
 			'src/assets/images/header/slide_02.jpg',
 			'src/assets/images/header/slide_03.jpg',
 		]);
+		
 		return () => (
 			<div>
 				{isShow.value && (

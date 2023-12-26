@@ -29,6 +29,7 @@ export default defineComponent({
 		}
 	},
 	methods: {
+		
 		formatMoney,
 		getAllDinnerRoom() {
 			this.categoryDinningRomService.getAll().then(res => {
@@ -36,16 +37,18 @@ export default defineComponent({
 			})
 		},
 		addByUser(status: number) {
-			if (this.productList?.length === 0) {
-				toast.error('Vui lòng chọn sản phẩm');
-				return;
-			}
-			this.reservationRequest.status = status;
+			if (window.confirm('Bạn có chắc chắn muốn đặt lịch không?')) {
+        this.reservationRequest.status = status;
 			this.reservationRequest.listPorduct = this.productList;
 			this.reservationService.addByUser(this.reservationRequest).then(res => {
 				toast.success(res?.data);
 				localStorage.removeItem('cartList');
+				window.location.reload();
 			})
+      } else {
+        console.log('Người dùng đã hủy bỏ');
+      }
+			
 		}
 	},
 	created() {
@@ -66,7 +69,7 @@ export default defineComponent({
 				<div class="row">
 					<div class="col-md-7 col-sm-8 col-6">
 						<h3 class="text-left">Thông tin khách hàng</h3>
-						<v-form id="contact" class="border-1">
+						<v-form id="contact" class="border-1" >
 							<v-container>
 								<v-row>
 									<v-col cols="12">

@@ -1,6 +1,48 @@
 import axiosClient from "../AxiosClient";
 
 const OrderApi = {
+
+    getDetailOrder: (id) => {
+        const url = `/admin/reservation/detail/${id}`;
+        return axiosClient.get(url, {
+            headers: {
+                Authorization: `Bearer ${
+                    localStorage.getItem("token")
+                }`,
+            },
+        });
+    },
+    getAllOrders: (params = null) => {
+        const url = "/admin/reservation/get-all";
+        return axiosClient.post(url, {
+            page: params.page,
+            size: params.pageSize,
+        }, {
+            headers: {
+                Authorization: `Bearer ${
+                    localStorage.getItem("token")
+                }`,
+            },
+        });
+    },
+    getByStatus: (params) => {
+        const url = "/admin/reservation/get-by-status";
+        return axiosClient.post(url, {
+            page: params.page,
+            size: params.pageSize,
+            sortBy: params.sortBy,
+            statusID: params.statusID,
+        }, {
+            headers: {
+                Authorization: `Bearer ${
+                    localStorage.getItem("token")
+                }`,
+            },
+        });
+    },
+
+
+
     CreateOrder: (data) => {
         const url = "/Order";
         return axiosClient.post(url, data);
@@ -21,16 +63,6 @@ const OrderApi = {
                 },
             }
         );
-    },
-    getDetailOrder: (id) => {
-        const url = `/user/reservation/detail/${id}`;
-        return axiosClient.get(url, {
-            headers: {
-                Authorization: `Bearer ${
-                    localStorage.getItem("token")
-                }`,
-            },
-        });
     },
     CreateUrlVnPay: (amount) => {
         debugger;
@@ -60,19 +92,7 @@ const OrderApi = {
             }
         );
     },
-    getAllOrders: (params = null) => {
-        const url = "/admin/reservation/get-all";
-        return axiosClient.post(url, {
-            page: params.page,
-            size: params.pageSize,
-        }, {
-            headers: {
-                Authorization: `Bearer ${
-                    localStorage.getItem("token")
-                }`,
-            },
-        });
-    },
+    
     GetWaitingorder: (params = null) => {
         const url = "/Order/getwaitingorder";
         return axiosClient.get(url, {

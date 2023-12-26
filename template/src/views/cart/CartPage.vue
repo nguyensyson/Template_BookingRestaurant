@@ -115,7 +115,7 @@ export default defineComponent({
 								</div>
 								<div class="card" v-if="cartList?.length > 0">
 									<div class="card-body">
-										<button type="button" class="btn btn-warning btn-block btn-lg" @click.prevent="redirectToCheckout()">Thanh toán
+										<button type="button" class="btn btn-warning btn-block btn-lg" @click.prevent="redirectToCheckout()">Đặt lịch
 										</button>
 									</div>
 								</div>

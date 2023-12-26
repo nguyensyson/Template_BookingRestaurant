@@ -20,7 +20,7 @@ export default defineComponent({
 								<div class="col-md-12">
 									<div class="inner-content">
 										<p>Copyright &copy; 2023 Template by :
-											<a href="https://github.com/pudo58" target={target.value}>La Van Tho Developer</a></p>
+											<a href="https://github.com/pudo58" target={target.value}>Sy Son Developer</a></p>
 									</div>
 								</div>
 							</div>

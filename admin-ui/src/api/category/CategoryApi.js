@@ -12,7 +12,7 @@ const categoryAPI = {
         });
     },
     CreateCategory: (body) => {
-        const url = "/ProductType";
+        const url = "/admin/category-product/add";
         return axiosClient.post(url, body, {
             headers: {
                 Authorization: `Bearer ${

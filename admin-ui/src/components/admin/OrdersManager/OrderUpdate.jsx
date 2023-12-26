@@ -20,7 +20,7 @@ import DinnerTableApi from "../../../api/dinner-table/DinnerTableApi";
 import moment from "moment";
 import ProductApi from "../../../api/product/ProductApi";
 
-const OrderAdd = () => {
+const OrderUpdate = () => {
   const { id } = useParams();
   const { addToast } = useToasts();
   const history = useHistory();
@@ -72,18 +72,18 @@ const OrderAdd = () => {
     }
   };
 
-  //đổi chỗ
-  // const arrangeSeats = () => {
-  //   const payload = {
-  //     idTable: checkBoxDataList,
-  //     idRoom: form.getFieldValue("room"),
-  //     idCategoryDiningRoom: form.getFieldValue("categoryRoom"),
-  //     numberOfPeopleBooked: form.getFieldValue("numberOfPeopleBooked"),
-  //   };
-  //   ReservationApi.arrangeSeats(payload, id).then((res) => {
-  //     alert(res);
-  //   });
-  // };
+  const arrangeSeats = () => {
+    const payload = {
+      idTable: checkBoxDataList,
+      idRoom: form.getFieldValue("room"),
+      idCategoryDiningRoom: form.getFieldValue("categoryRoom"),
+      numberOfPeopleBooked: form.getFieldValue("numberOfPeopleBooked"),
+    };
+    ReservationApi.arrangeSeats(payload, id).then((res) => {
+      alert(res);
+    });
+    window.location.reload();
+  };
 
   const dataDinnerTable = tableList.map((item, index) => ({
     id: item?.id,
@@ -104,8 +104,9 @@ const OrderAdd = () => {
   }));
 
   const handleOnChangeRoom = async (value) => {
+    console.log(id + " " + value);
     try {
-      const res = await DinnerTableApi.getAllByDiningRoomId(value);
+      const res = await DinnerTableApi.getAllByDiningRoomId(id, value);
       setTableList(res);
     } catch (error) {
       console.error("Lỗi khi tải danh sách bàn ăn:", error);
@@ -235,6 +236,10 @@ const OrderAdd = () => {
           numberOfPeopleBooked: orderDetail?.numberOfPeopleBooked,
           reservationDate: moment(orderDetail?.reservationDate),
           categoryRoom: orderDetail?.idCategoryDiningRoom,
+          upfrontPrice: orderDetail?.upfrontPrice + " VND",
+          originalPrice: orderDetail?.originalPrice + " VND",
+          actualPrice: orderDetail?.actualPrice + " VND",
+          priceToPay: orderDetail?.priceToPay + " VND",
         });
         setRoomList(orderDetail?.diningRoom);
         setTableList(orderDetail?.dinnerTables);
@@ -275,35 +280,37 @@ const OrderAdd = () => {
     ReservationApi.changeStatus(payload, id).then((res) => {
       alert(res);
     });
+    history.push(`/admin/orders`);
+    window.location.reload();
   };
 
-  // đổi sản phẩm
-  // const onChangeProduct = () => {
-  //   const productSelected = productList.filter((item) =>
-  //     checkBoxProductDataList.includes(item.id)
-  //   );
-  //   const productIsOrdered = dataProduct
-  //     .filter((item) => item.isOrdered === true)
-  //     .map((item) => item);
-  //   const payload = {
-  //     listPorduct: [...productIsOrdered, ...productSelected],
-  //     originalPrice: productSelected.reduce(
-  //       (total, item) => total + item.price * item.quantity,
-  //       0
-  //     ),
-  //     actualPrice: productSelected.reduce(
-  //       (total, item) => total + item.price * item.quantity,
-  //       0
-  //     ),
-  //     priceToPay: productSelected.reduce(
-  //       (total, item) => total + item.price * item.quantity,
-  //       0
-  //     ),
-  //   };
-  //   ReservationApi.changeProduct(payload, id).then((res) => {
-  //     alert(res);
-  //   });
-  // };
+  const onChangeProduct = () => {
+    const productSelected = productList.filter((item) =>
+      checkBoxProductDataList.includes(item.id)
+    );
+    const productIsOrdered = dataProduct
+      .filter((item) => item.isOrdered === true)
+      .map((item) => item);
+    const payload = {
+      listPorduct: [...productIsOrdered, ...productSelected],
+      originalPrice: productSelected.reduce(
+        (total, item) => total + item.price * item.quantity,
+        0
+      ),
+      actualPrice: productSelected.reduce(
+        (total, item) => total + item.price * item.quantity,
+        0
+      ),
+      priceToPay: productSelected.reduce(
+        (total, item) => total + item.price * item.quantity,
+        0
+      ),
+    };
+    ReservationApi.changeProduct(payload, id).then((res) => {
+      alert(res);
+    });
+    window.location.reload();
+  };
 
   return (
     <>
@@ -343,6 +350,7 @@ const OrderAdd = () => {
               >
                 <Input
                   style={{ height: 30 }}
+                  disabled={true}
                   placeholder="Nhập số điện thoại..."
                 />
               </Form.Item>
@@ -358,6 +366,7 @@ const OrderAdd = () => {
                 <Input
                   style={{ height: 30 }}
                   placeholder="Nhập họ và tên..."
+                  disabled={true}
                   type="text"
                 />
               </Form.Item>
@@ -390,6 +399,66 @@ const OrderAdd = () => {
                   showTime={{ format: "HH:mm" }}
                   format="YYYY-MM-DD HH:mm"
                   placeholder="Ngày và giờ đặt..."
+                />
+              </Form.Item>
+            </div>
+            <div className="col-6">
+              <Form.Item
+                label="Đặt cọc"
+                name="upfrontPrice"
+                labelCol={{ span: 6 }}
+                tooltip="đặt cọc"
+                rules={[{ required: true }]}
+              >
+                <Input
+                  style={{ height: 30 }}
+                  disabled={true}
+                  placeholder="Đặt cọc..."
+                />
+              </Form.Item>
+            </div>
+            <div className="col-6">
+              <Form.Item
+                label="Giá trị hoá đơn"
+                name="originalPrice"
+                labelCol={{ span: 6 }}
+                tooltip="giá trị hoá đơn"
+                rules={[{ required: true }]}
+              >
+                <Input
+                  style={{ height: 30 }}
+                  disabled={true}
+                  placeholder="giá trị hoá đơn..."
+                />
+              </Form.Item>
+            </div>
+            <div className="col-6">
+              <Form.Item
+                label="Giá trị thực tế"
+                name="actualPrice"
+                labelCol={{ span: 6 }}
+                tooltip="giá trị thực tế"
+                rules={[{ required: true }]}
+              >
+                <Input
+                  style={{ height: 30 }}
+                  disabled={true}
+                  placeholder="giá trị thực tế..."
+                />
+              </Form.Item>
+            </div>
+            <div className="col-6">
+              <Form.Item
+                label="Còn phải trả"
+                name="priceToPay"
+                labelCol={{ span: 6 }}
+                tooltip="còn phải trả"
+                rules={[{ required: true }]}
+              >
+                <Input
+                  style={{ height: 30 }}
+                  disabled={true}
+                  placeholder="còn phải trả..."
                 />
               </Form.Item>
             </div>
@@ -450,7 +519,7 @@ const OrderAdd = () => {
             <div className="col-12">
               <Form.Item
                 label="Bàn ăn"
-                name="table"
+                // name="table"
                 labelCol={{ span: 2, offset: 1 }}
                 tooltip="bàn ăn"
                 rules={[{ required: true }]}
@@ -458,8 +527,7 @@ const OrderAdd = () => {
                 <Table dataSource={dataDinnerTable} columns={tableColumns} />
               </Form.Item>
             </div>
-
-            {/* <div className={`col-12 d-flex justify-content-center`}>
+            <div className={`col-12 d-flex justify-content-center`}>
               <button
                 type={`button`}
                 className={`btn btn-primary`}
@@ -467,12 +535,11 @@ const OrderAdd = () => {
               >
                 Sắp xếp chỗ ngồi
               </button>
-            </div> */}
-
+            </div>
             <div className="col-12 mb-3">
               <Form.Item
                 label="Món ăn"
-                name="product"
+                // name="product"
                 labelCol={{ span: 2, offset: 1 }}
                 tooltip="món ăn"
                 rules={[{ required: true }]}
@@ -480,7 +547,7 @@ const OrderAdd = () => {
                 <Table dataSource={dataProduct} columns={tableProductColumns} />
               </Form.Item>
 
-              {/* <div className={`col-12 d-flex justify-content-center`}>
+              <div className={`col-12 d-flex justify-content-center`}>
                 <button
                   type={`button`}
                   className={`btn btn-primary`}
@@ -488,15 +555,12 @@ const OrderAdd = () => {
                 >
                   Thêm món
                 </button>
-              </div> */}
+              </div>
             </div>
           </div>
 
           <Form.Item wrapperCol={{ span: 16, offset: 4 }}>
-            {/* {button(status, onHandleSubmit)} */}
-            <Button type="primary" htmlType="submit" block>
-              Tạo phiếu đặt
-            </Button>
+            {button(status, onHandleSubmit)}
           </Form.Item>
         </Form>
       </div>
@@ -504,4 +568,4 @@ const OrderAdd = () => {
   );
 };
 
-export default OrderAdd;
+export default OrderUpdate;
