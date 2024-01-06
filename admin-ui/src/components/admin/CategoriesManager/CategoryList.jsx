@@ -1,26 +1,27 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Breadcrumb,
+  Button,
   Image,
+  Input,
+  Pagination,
+  Popconfirm,
   Space,
   Table,
-  Typography,
-  Pagination,
   Tag,
-  Popconfirm,
-  Badge
 } from "antd";
+import { SearchOutlined } from "@ant-design/icons";
 import { NavLink } from "react-router-dom";
 import { BiEdit } from "react-icons/bi";
+import { LuClipboardList } from "react-icons/lu";
 import { ImBin } from "react-icons/im";
-import categoryAPI from "../../../api/category/CategoryApi";
-import { useState } from "react";
-import { format } from "date-fns";
 import LoadingSpin from "../../loading/LoadingSpin";
+import { useToasts } from "react-toast-notifications";
 import Swal from "sweetalert2";
+import categoryAPI from "../../../api/category/CategoryApi";
 
-const { Text } = Typography;
 const CategoryList = () => {
+  const { addToast } = useToasts();
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState({
     totalItems: 0,
@@ -41,55 +42,156 @@ const CategoryList = () => {
         })
     );
   };
-  const cancel = (e) => {};
   const [param, setParam] = useState({
-    page: 1,
-    pageSize: 10,
-    search: "",
+    page: 0,
+    size: 10,
+  });
+  const [searchText, setSearchText] = useState("");
+  const handleSearch = (value) => {
+    setSearchText(value);
+    setParam((prev) => ({
+      ...prev,
+      search: value,
+      page: 1,
+    }));
+  };
+  const getColumnSearchProps = (dataIndex) => ({
+    filterDropdown: ({ setSelectedKeys, selectedKeys, clearFilters }) => (
+      <div style={{ padding: 8 }}>
+        <Input
+          placeholder={`Tìm kiếm tên món...`}
+          value={selectedKeys[0]}
+          onChange={(e) =>
+            setSelectedKeys(e.target.value ? [e.target.value] : [])
+          }
+          onPressEnter={() => handleSearch(selectedKeys[0])}
+          style={{ marginBottom: 8, display: "block", height: 30 }}
+        />
+        <Space>
+          <Button
+            type="primary"
+            size="small"
+            onClick={() => handleSearch(selectedKeys[0])}
+            style={{ width: 90 }}
+          >
+            Tìm
+          </Button>
+          <Button
+            type="primary"
+            size="small"
+            onClick={() => {
+              clearFilters();
+              setSearchText("");
+              handleSearch("");
+            }}
+            danger
+            style={{ width: 90 }}
+          >
+            Xóa
+          </Button>
+        </Space>
+      </div>
+    ),
+    filterIcon: (filtered) => (
+      <SearchOutlined style={{ color: filtered ? "#1890ff" : undefined }} />
+    ),
+    onFilter: (value, record) =>
+      record[dataIndex]
+        ? record[dataIndex]
+            .toString()
+            .toLowerCase()
+            .includes(value.toLowerCase())
+        : "",
+    render: (text) => {
+      return dataIndex === "name" ? (
+        <span>
+          {searchText &&
+          text.toLowerCase().includes(searchText.toLowerCase()) ? (
+            <span>
+              {text
+                .split(new RegExp(`(${searchText})`, "gi"))
+                .map((fragment, i) =>
+                  fragment.toLowerCase() === searchText.toLowerCase() ? (
+                    <span key={i} className="bg-warning">
+                      {fragment}
+                    </span>
+                  ) : (
+                    fragment
+                  )
+                )}
+            </span>
+          ) : (
+            text
+          )}
+        </span>
+      ) : (
+        text
+      );
+    },
   });
   useEffect(() => {
-    const getCategories = async () => {
+    let isMounted = true;
+    const getCategoryAll = () => {
       try {
         setLoading(true);
-        const { data } = await categoryAPI.getAllCategories(param);
+        categoryAPI
+          .getAllCategories({
+            page: param.page,
+            size: param.size,
+          })
+          .then((res) => {
+            setData(res);
+            dataSource = res.content;
+          });
         setLoading(false);
-        setData(data);
       } catch (error) {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
-    getCategories();
-  }, [param]);
-  const DeleteCategory = async (id) => {
-    try {
-      setLoading(true);
-      await categoryAPI.removeCategory(id);
-      setParam({ ...param });
-      Swal.fire({
-        icon: 'success',
-        title: 'Thành công',
-        text: 'Xóa danh mục thành công!',
-      })
-      setLoading(false);
-    } catch (error) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Thất bại...',
-        text: 'Danh mục đã tồn tại sản phẩm!',
-      })
-      setLoading(false);
-    }
-  };
-  const dataSource = data?.data?.map((item, index) => {
-    return {
-      key: index + 1,
-      id: item.productTypeId,
-      nameProductType: item.nameProductType,
-      quantity: item.products.length,
-      imageTypeProduct: item.imageTypeProduct,
-      createdAt: item.createdAt,
+    getCategoryAll();
+    return () => {
+      isMounted = false;
     };
-  });
+  }, [param]);
+
+  // Remove product
+  // const handleOk = async (id) => {
+  //   try {
+  //     await categoryAPI.removeProduct(id);
+  //     const { data } = await categoryAPI.getAllProduct(param);
+  //     setData(data);
+  //     Swal.fire({
+  //       icon: "success",
+  //       title: "Thành công",
+  //       text: "Xóa sản phẩm thành công!",
+  //     });
+  //   } catch (error) {
+  //     Swal.fire({
+  //       icon: "error",
+  //       title: "Thất bại...",
+  //       text: "Xóa sản phẩm thất bại!",
+  //     });
+  //   }
+  // };
+  // const handleCancel = () => {
+  //   addToast("Hủy xóa", {
+  //     appearance: "error",
+  //     autoDismiss: true,
+  //     autoDismissTimeout: 1000,
+  //   });
+  // };
+  let dataSource = [];
+  if (data && data.content && data.content.length > 0) {
+    dataSource = data.content?.map((item, index) => {
+      return {
+        key: index + 1,
+        id: item.id,
+        name: item.nameCategory,
+      };
+    });
+  }
   const columns = [
     {
       title: "STT",
@@ -98,40 +200,52 @@ const CategoryList = () => {
       align: "center",
     },
     {
-      title: "Tên danh mục",
-      dataIndex: "nameProductType",
-      key: "nameProductType",
+      title: "Tên loại",
+      dataIndex: "name",
+      key: "name",
       align: "center",
-      render: (nameProductType, record) => (
-        <Badge count={record.quantity}>
-          <Tag color="green">{nameProductType}</Tag>
-        </Badge>
-      ),
+      ...getColumnSearchProps("name"),
     },
-    {
-      title: "Ảnh danh mục",
-      dataIndex: "imageTypeProduct",
-      key: "imageTypeProduct",
-      align: "center",
-      render: (imageTypeProduct) => (
-        <Image
-          src={imageTypeProduct}
-          alt={imageTypeProduct}
-          width={100}
-          height={100}
-          className="object-fit-cover border rounded border border-white"
-        />
-      ),
-    },
-    {
-      title: "Ngày tạo",
-      dataIndex: "createdAt",
-      key: "createdAt",
-      align: "center",
-      render: (createdAt) => (
-        <>{format(new Date(createdAt), "HH:mm:ss dd/MM/yyyy")}</>
-      ),
-    },
+    // {
+    //   title: "Hình ảnh",
+    //   dataIndex: "image",
+    //   key: "image",
+    //   align: "center",
+    //   render: (image) => (
+    //     <Image
+    //       src={image}
+    //       alt={image}
+    //       width={100}
+    //       height={100}
+    //       className="object-fit-cover border rounded border border-white"
+    //     />
+    //   ),
+    // },
+    // {
+    //   title: "Giá món",
+    //   dataIndex: "price",
+    //   key: "price",
+    //   align: "center",
+    // },
+    // {
+    //   title: "Giảm giá (%)",
+    //   dataIndex: "discount",
+    //   key: "discount",
+    //   align: "center",
+    // },
+    // {
+    //   title: "Tên danh mục",
+    //   dataIndex: "categoryName",
+    //   key: "categoryName",
+    //   align: "center",
+    //   render: (categoryName) => <Tag color="#f50">{categoryName}</Tag>,
+    // },
+    // {
+    //   title: "Trạng thái",
+    //   dataIndex: "status",
+    //   key: "status",
+    //   align: "center",
+    // },
     {
       title: "Hành động",
       dataIndex: "action",
@@ -142,17 +256,21 @@ const CategoryList = () => {
           <NavLink to={`/admin/categories-edit/${record.id}`}>
             <BiEdit className="text-info" />
           </NavLink>
-          <Popconfirm
-            title="Xóa danh mục sản phẩm"
-            description="Bạn chắc chắn xóa danh mục sản phẩm này?"
-            onConfirm={() => DeleteCategory(record.id)}
-            onCancel={cancel}
+          {/* <NavLink to={`/admin/comment/${record.id}`}>
+            <LuClipboardList className="text-info" />
+          </NavLink> */}
+          {/* <Popconfirm
+            title="Bạn có chắc chắn xóa?"
+            onConfirm={() => {
+              handleOk(record.id);
+            }}
+            onCancel={handleCancel}
+            className="border border-white"
             okText="Có"
-            cancelText="Hủy">
-            <Text type="danger">
-              <ImBin />
-            </Text>
-          </Popconfirm>
+            cancelText="Hủy"
+          >
+            <ImBin className="text-danger" />
+          </Popconfirm> */}
         </Space>
       ),
     },
@@ -162,9 +280,10 @@ const CategoryList = () => {
       <Breadcrumb
         style={{
           margin: "16px 0",
-        }}>
+        }}
+      >
         <Breadcrumb.Item>Bảng điều khiển</Breadcrumb.Item>
-        <Breadcrumb.Item>Danh sách danh mục</Breadcrumb.Item>
+        <Breadcrumb.Item>Danh sách sản phẩm</Breadcrumb.Item>
       </Breadcrumb>
       <div>
         {loading && (
@@ -172,19 +291,32 @@ const CategoryList = () => {
             <LoadingSpin />
           </div>
         )}
-        <Table dataSource={dataSource} columns={columns} pagination={false} />
-        <Pagination
-          style={{
-            textAlign: "right",
-            padding: "10px 20px",
-          }}
-          current={data.page}
-          pageSize={data.pageSize}
-          total={data.totalItems}
-          onChange={handlePaginationChange}
-          showSizeChanger
-          showTotal={(total) => `Tổng ${total} sản phẩm`}
-        />
+        {dataSource.length > 0 && (
+          <div>
+            <Table
+              dataSource={dataSource}
+              columns={columns}
+              pagination={false}
+            />
+            <Pagination
+              style={{
+                textAlign: "right",
+                padding: "10px 20px",
+              }}
+              current={data.page}
+              pageSize={data.pageSize}
+              total={data.totalItems}
+              onChange={handlePaginationChange}
+              showSizeChanger
+              showTotal={(total) => `Tổng ${total} sản phẩm`}
+            />
+          </div>
+        )}
+        {dataSource.length === 0 && !loading && (
+          <div className="text-center">
+            <h5>Không có loại sản phẩm nào</h5>
+          </div>
+        )}
       </div>
     </>
   );

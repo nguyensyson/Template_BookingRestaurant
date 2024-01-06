@@ -14,41 +14,12 @@ const CategoryAdd = () => {
   const history = useHistory();
   const [messageApi, contextHolder] = message.useMessage();
   const [loading, setLoading] = useState(false);
-  const [fileList, setFileList] = useState([]);
-  const [preview, setPreview] = useState("");
-  const handleBeforeUpload = (file) => {
-    setFileList([file]);
-    return false;
-  };
-  const handleUpload = () => {
-    const file = fileList[0];
-    if (file.size > 2 * 1024 * 1024) {
-      Swal.fire({
-        icon: "error",
-        title: "Tệp tin quá lớn...",
-        text: "Vui lòng chọn một tệp tin nhỏ hơn 2MB!",
-      });
-      return;
-    }
-    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
-      Swal.fire({
-        icon: "error",
-        title: "Sai tệp tin...",
-        text: "Vui lòng chọn một tệp tin hình ảnh (jpg, png, webp)!",
-      });
-      return;
-    }
-    const filePreview = URL.createObjectURL(file);
-    setPreview(filePreview);
-  };
   const onHandleSubmit = async (e) => {
-    const formDataApi = new FormData();
     const item = await form.validateFields();
     const formData = {
       nameProductType: item.nameProductType,
-      imageTypeProduct: fileList[0],
     };
-    if (!formData.nameProductType || !formData.imageTypeProduct) {
+    if (!formData.nameProductType) {
       messageApi.open({
         type: "error",
         content: "Không để trống các trường",
@@ -58,9 +29,9 @@ const CategoryAdd = () => {
     e.preventDefault();
     try {
       // Proceed with API call
-      formDataApi.append("nameCategory", formData.nameProductType);
-      formDataApi.append("image", formData.imageTypeProduct);
-      await categoryAPI.CreateCategory(formDataApi);
+      await categoryAPI.CreateCategory({
+        nameCategory: formData.nameProductType,
+      });
       addToast("Thêm mới danh mục thành công!", {
         appearance: "success",
         autoDismiss: true,
@@ -110,39 +81,6 @@ const CategoryAdd = () => {
             labelCol={{ span: 3, offset: 1 }}
           >
             <Input style={{ height: 30 }} />
-          </Form.Item>
-          <Form.Item
-            label="Hình ảnh"
-            tooltip="Ảnh danh mục xem trước"
-            name="imageTypeProduct"
-            labelCol={{ span: 3, offset: 1 }}
-          >
-            <Upload
-              listType="picture-card"
-              className="imageTypeProduct"
-              accept=".png,.jpg,.jpeg,.webp"
-              maxCount={1}
-              fileList={fileList}
-              beforeUpload={handleBeforeUpload}
-              onChange={handleUpload}
-              showUploadList={false}
-            >
-              {preview ? (
-                <img
-                  src={preview}
-                  alt={preview}
-                  width={96}
-                  className="rounded"
-                />
-              ) : (
-                <img
-                  src="https://res.cloudinary.com/do9rcgv5s/image/upload/v1669841925/no-image-icon-6_ciydgz.png"
-                  alt="Error"
-                  width={96}
-                  className="rounded"
-                />
-              )}
-            </Upload>
           </Form.Item>
           <Form.Item wrapperCol={{ span: 16, offset: 4 }}>
             <Button

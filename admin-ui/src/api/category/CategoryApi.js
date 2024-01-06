@@ -1,19 +1,18 @@
 import axiosClient from "../AxiosClient";
 
 const categoryAPI = {
-    getAllCategories: () => {
+    getAllCategories: (body) => {
         const url = "/view/category-product/get-all";
-        return axiosClient.get(url, {
-            headers: {
-                Authorization: `Bearer ${
-                    localStorage.getItem("token") || ""
-                }`,
-            },
+        return axiosClient.post(url, {
+            page: body.page,
+            size: body.size,
         });
     },
     CreateCategory: (body) => {
         const url = "/admin/category-product/add";
-        return axiosClient.post(url, body, {
+        return axiosClient.post(url, {
+            nameCategory: body.nameCategory,
+        }, {
             headers: {
                 Authorization: `Bearer ${
                     localStorage.getItem("token") || ""
@@ -22,18 +21,14 @@ const categoryAPI = {
         });
     },
     getCategoryDetail: (id) => {
-        const url = `/ProductType/${id}`;
-        return axiosClient.get(url, {
-            headers: {
-                Authorization: `Bearer ${
-                    localStorage.getItem("token") || ""
-                }`,
-            },
-        });
+        const url = `/view/category-product/${id}`;
+        return axiosClient.get(url);
     },
     updateCategory: (id, body) => {
-        const url = `/ProductType/update/${id}`;
-        return axiosClient.post(url, body, {
+        const url = `/admin/category-product/update/${id}`;
+        return axiosClient.post(url, {
+            nameCategory: body.nameCategory,
+        }, {
             headers: {
                 Authorization: `Bearer ${
                     localStorage.getItem("token") || ""

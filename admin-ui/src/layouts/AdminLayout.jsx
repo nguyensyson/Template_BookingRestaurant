@@ -287,6 +287,12 @@ const AdminLayout = () => {
             {/* discount router */}
             <Route path="/admin/discounts" component={DiscountList} />
             <Route path="/admin/discount-add" component={DiscountAdd} />
+            {/* dinner room router */}
+            <Route path="/admin/dinner-room" component={DiscountList} />
+            <Route path="/admin/room-add" component={DiscountAdd} />
+            {/* dinner table router */}
+            <Route path="/admin/dinner-table" component={DiscountList} />
+            <Route path="/admin/table-add" component={DiscountAdd} />
             {/* Redirect to Dashboard */}
             <Redirect to="/admin/dashboard" />
           </Switch>

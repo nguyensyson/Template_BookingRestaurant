@@ -81,7 +81,7 @@ const ProductEdit = () => {
         name: item.name,
         price: item.price,
         introduce: item.introduce,
-        images: fileList[0],
+        images: fileList[0] || preview,
         category: item.category,
       };
       const formDataApi = new FormData();
@@ -117,12 +117,11 @@ const ProductEdit = () => {
       setLoading(true);
       categoryAPI
         .getAllCategories({
-          page: 1,
-          pageSize: 20,
-          search: "",
+          page: 0,
+          size: 20,
         })
         .then((res) => {
-          setCategories(res);
+          setCategories(res.content);
         });
     } catch (error) {
       console.error(error);
@@ -173,31 +172,7 @@ const ProductEdit = () => {
               type="text"
             />
           </Form.Item>
-          {/*<Form.Item*/}
-          {/*    label="Số lượng"*/}
-          {/*    name="Quantity"*/}
-          {/*    labelCol={{span: 3, offset: 1}}*/}
-          {/*    tooltip="Tổng số lượng sản phẩm"*/}
-          {/*    rules={[{required: true}]}*/}
-          {/*>*/}
-          {/*    <Input*/}
-          {/*        style={{height: 30}}*/}
-          {/*        placeholder="Nhập số lượng sản phẩm..."*/}
-          {/*        type="number"*/}
-          {/*    />*/}
-          {/*</Form.Item>*/}
-          {/*<Form.Item*/}
-          {/*    label="Giảm giá"*/}
-          {/*    name="Discount"*/}
-          {/*    labelCol={{span: 3, offset: 1}}*/}
-          {/*    tooltip="% Giảm giá sản phẩm"*/}
-          {/*    rules={[{required: true}]}*/}
-          {/*>*/}
-          {/*    <Input*/}
-          {/*        style={{height: 30}}*/}
-          {/*        placeholder="Nhập giảm giá..."*/}
-          {/*    />*/}
-          {/*</Form.Item>*/}
+
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item
@@ -271,28 +246,6 @@ const ProductEdit = () => {
               )}
             </Upload>
           </Form.Item>
-          {/*<Form.Item*/}
-          {/*    label="Mô tả ngắn"*/}
-          {/*    name="shortDescription"*/}
-          {/*    labelCol={{span: 3, offset: 1}}*/}
-          {/*    rules={[{required: true}]}*/}
-          {/*>*/}
-          {/*    <TextArea*/}
-          {/*        rows={2}*/}
-          {/*        placeholder="Mô tả ngắn sản phẩm..."*/}
-          {/*    />*/}
-          {/*</Form.Item>*/}
-          {/*<Form.Item*/}
-          {/*    label="Mô tả dài"*/}
-          {/*    name="fullDescription"*/}
-          {/*    labelCol={{span: 3, offset: 1}}*/}
-          {/*    rules={[{required: true}]}*/}
-          {/*>*/}
-          {/*    <TextArea*/}
-          {/*        rows={4}*/}
-          {/*        placeholder="Mô tả chi tiết sản phẩm..."*/}
-          {/*    />*/}
-          {/*</Form.Item>*/}
           <Form.Item wrapperCol={{ span: 16, offset: 4 }}>
             <Button
               type="primary"

@@ -105,7 +105,7 @@ const OrderAdd = () => {
 
   const handleOnChangeRoom = async (value) => {
     try {
-      const res = await DinnerTableApi.getAllByDiningRoomId(value);
+      const res = await DinnerTableApi.getAllByRoomId(value);
       setTableList(res);
     } catch (error) {
       console.error("Lỗi khi tải danh sách bàn ăn:", error);
@@ -255,7 +255,7 @@ const OrderAdd = () => {
 
     const fetchProductList = async () => {
       try {
-        const res = await ProductApi.getAllByReservationId(id);
+        const res = await ProductApi.getAllByReservationId();
         setProductList(res);
       } catch (error) {
         console.error("Lỗi khi tải danh sách món ăn:", error);
@@ -313,11 +313,11 @@ const OrderAdd = () => {
         }}
       >
         <Breadcrumb.Item>Bảng điều khiển</Breadcrumb.Item>
-        <Breadcrumb.Item>Chi tiết đơn đặt</Breadcrumb.Item>
+        <Breadcrumb.Item>Tạo mới đơn đặt</Breadcrumb.Item>
       </Breadcrumb>
       <div className="mt-3">
         <Title level={4} className="text-uppercase text-center">
-          Chi tiết đơn đặt
+          Tạo mới đơn đặt
         </Title>
         {loading && (
           <div>
