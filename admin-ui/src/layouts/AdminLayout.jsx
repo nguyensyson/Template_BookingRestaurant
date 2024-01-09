@@ -46,6 +46,12 @@ import DiscountAdd from "../components/admin/DiscountManager/DiscountAdd";
 import DiscountList from "../components/admin/DiscountManager/DiscountList";
 import OrderUpdate from "../components/admin/OrdersManager/OrderUpdate";
 import OrderAdd from "../components/admin/OrdersManager/OrderAdd";
+import DinnerRoomAdd from "../components/admin/RoomManager/DinnerRoomAdd";
+import DinnerRoomList from "../components/admin/RoomManager/DinnerRoomList";
+import DinnerRoomUpdate from "../components/admin/RoomManager/DinnerRoomUpdate";
+import DinnerTableList from "../components/admin/TableManager/DinnerTableList";
+import DinnerTableAdd from "../components/admin/TableManager/DinnerTableAdd";
+import DinnerTableUpdate from "../components/admin/TableManager/DinnerTableUpdate";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -109,7 +115,7 @@ const AdminLayout = () => {
           </Menu.Item>
 
           {/*Order Manager */}
-          <SubMenu key="subMenu-7" icon={<BsBoxSeam />} title="Quản lý đơn đặt">
+          <SubMenu key="subMenu-8" icon={<BsBoxSeam />} title="Quản lý đơn đặt">
             <Menu.Item key="/admin/create-order" icon={<IoCreateOutline />}>
               <NavLink to="/admin/create-order">Tạo mới đơn đặt</NavLink>
             </Menu.Item>
@@ -201,7 +207,7 @@ const AdminLayout = () => {
             </Menu.Item>
           </SubMenu>
           <SubMenu
-            key="subMenu-5"
+            key="subMenu-6"
             icon={<MdMeetingRoom />}
             title="Quản lý phòng ăn"
           >
@@ -213,7 +219,7 @@ const AdminLayout = () => {
             </Menu.Item>
           </SubMenu>
           <SubMenu
-            key="subMenu-5"
+            key="subMenu-7"
             icon={<MdTableRestaurant />}
             title="Quản lý bàn ăn"
           >
@@ -288,11 +294,16 @@ const AdminLayout = () => {
             <Route path="/admin/discounts" component={DiscountList} />
             <Route path="/admin/discount-add" component={DiscountAdd} />
             {/* dinner room router */}
-            <Route path="/admin/dinner-room" component={DiscountList} />
-            <Route path="/admin/room-add" component={DiscountAdd} />
+            <Route path="/admin/dinner-room" component={DinnerRoomList} />
+            <Route path="/admin/room-add" component={DinnerRoomAdd} />
+            <Route path="/admin/room-update/:id" component={DinnerRoomUpdate} />
             {/* dinner table router */}
-            <Route path="/admin/dinner-table" component={DiscountList} />
-            <Route path="/admin/table-add" component={DiscountAdd} />
+            <Route path="/admin/dinner-table" component={DinnerTableList} />
+            <Route path="/admin/table-add" component={DinnerTableAdd} />
+            <Route
+              path="/admin/table-update/:id"
+              component={DinnerTableUpdate}
+            />
             {/* Redirect to Dashboard */}
             <Redirect to="/admin/dashboard" />
           </Switch>

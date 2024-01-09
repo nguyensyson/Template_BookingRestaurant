@@ -12,12 +12,26 @@ const OrderApi = {
             },
         });
     },
+    getInvoice: (id) => {
+        const url = `/view/reservation/invoice/${id}`;
+        return axiosClient.get(url);
+    },
     getAllOrders: (params = null) => {
         const url = "/admin/reservation/get-all";
         return axiosClient.post(url, {
             page: params.page,
             size: params.pageSize,
         }, {
+            headers: {
+                Authorization: `Bearer ${
+                    localStorage.getItem("token")
+                }`,
+            },
+        });
+    },
+    addByAdmin(body) {
+        const url = "/admin/reservation/addByAdmin";
+        return axiosClient.post(url, body, {
             headers: {
                 Authorization: `Bearer ${
                     localStorage.getItem("token")
@@ -40,7 +54,6 @@ const OrderApi = {
             },
         });
     },
-
 
 
     CreateOrder: (data) => {
@@ -92,7 +105,6 @@ const OrderApi = {
             }
         );
     },
-    
     GetWaitingorder: (params = null) => {
         const url = "/Order/getwaitingorder";
         return axiosClient.get(url, {

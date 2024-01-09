@@ -58,13 +58,8 @@ const ProductApi = {
             },
         });
     },
-    getAllByReservationId: (id = null) => {
-        const url = `/view/product/getAll`;
-        if (id !== null) {
-           url += `/${id}`;
-        } else {
-            url += `/0`;
-        }
+    getAllByReservationId: (id) => {
+        const url = `/view/product/getAll/${id}`;
         return axiosClient.get(url);
     }
 };

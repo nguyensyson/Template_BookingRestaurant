@@ -15,7 +15,9 @@ import OrderApi from "../../../api/order/OrderApi.js";
 import { format } from "date-fns";
 import LoadingSpin from "../../loading/LoadingSpin.jsx";
 import Bill from "../../../pages/other/Bill.jsx";
+import { BiEdit, BiDetail } from "react-icons/bi";
 import PrintButton from "../../../pages/other/PrintButton.jsx";
+import { NavLink } from "react-router-dom/cjs/react-router-dom.js";
 
 const OrderPending = () => {
   const [loading, setLoading] = useState(false);
@@ -48,8 +50,11 @@ const OrderPending = () => {
   });
 
   const redirectOrder = (id) => {
-    //redirect to order detail
-    window.location.href = `/admin/order-detail/${id}`;
+    OrderApi.getInvoice(id).then((response) => {
+      setCurrentInfo(response);
+      setCurrentOrderDetail(response.products);
+    });
+    setIsModal(true);
   };
 
   const handleOk = () => {
@@ -199,8 +204,11 @@ const OrderPending = () => {
       align: "center",
       render: (id) => (
         <Space size="middle">
-          <Button type="primary" onClick={(e) => redirectOrder(id)}>
-            Chi tiết
+          <NavLink to={`/admin/order-detail/${id}`}>
+            <BiEdit className="text-info" />
+          </NavLink>
+          <Button type="text" onClick={(e) => redirectOrder(id)}>
+            <BiDetail className="text-info" />
           </Button>
         </Space>
       ),
@@ -327,7 +335,7 @@ const OrderPending = () => {
       <Modal
         title="Hóa đơn chi tiết"
         open={isModal}
-        width={829}
+        width={840}
         onCancel={handleCancelBill}
         footer={null}
       >

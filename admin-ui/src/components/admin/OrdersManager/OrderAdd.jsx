@@ -155,6 +155,7 @@ const OrderAdd = () => {
       }
     });
   };
+
   const button = (status, f) => {
     if (status === 1) {
       return (
@@ -224,26 +225,26 @@ const OrderAdd = () => {
   ];
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const orderDetail = await OrderApi.getDetailOrder(id);
-        // Điền dữ liệu vào các trường nhập liệu
-        form.setFieldsValue({
-          sdt: orderDetail?.sdt,
-          fullNameClient: orderDetail?.fullname,
-          numberOfPeopleBooked: orderDetail?.numberOfPeopleBooked,
-          reservationDate: moment(orderDetail?.reservationDate),
-          categoryRoom: orderDetail?.idCategoryDiningRoom,
-        });
-        setRoomList(orderDetail?.diningRoom);
-        setTableList(orderDetail?.dinnerTables);
-        setStatus(orderDetail?.oderStatus?.id);
-        setLoading(false);
-      } catch (error) {
-        setLoading(false);
-      }
-    };
+    // const fetchData = async () => {
+    //   try {
+    //     setLoading(true);
+    //     const orderDetail = await OrderApi.getDetailOrder(id);
+    //     // Điền dữ liệu vào các trường nhập liệu
+    //     form.setFieldsValue({
+    //       sdt: orderDetail?.sdt,
+    //       fullNameClient: orderDetail?.fullname,
+    //       numberOfPeopleBooked: orderDetail?.numberOfPeopleBooked,
+    //       reservationDate: moment(orderDetail?.reservationDate),
+    //       categoryRoom: orderDetail?.idCategoryDiningRoom,
+    //     });
+    //     setRoomList(orderDetail?.diningRoom);
+    //     setTableList(orderDetail?.dinnerTables);
+    //     setStatus(orderDetail?.oderStatus?.id);
+    //     setLoading(false);
+    //   } catch (error) {
+    //     setLoading(false);
+    //   }
+    // };
     const fetchCategoryDinningRoomList = async () => {
       try {
         const res = await CategoryDinningRoomApi.getAll();
@@ -255,26 +256,45 @@ const OrderAdd = () => {
 
     const fetchProductList = async () => {
       try {
-        const res = await ProductApi.getAllByReservationId();
+        const res = await ProductApi.getAllByReservationId(0);
         setProductList(res);
       } catch (error) {
         console.error("Lỗi khi tải danh sách món ăn:", error);
       }
     };
 
-    fetchData();
+    // fetchData();
     fetchProductList();
     fetchCategoryDinningRoomList();
   }, [id, form]);
 
   const onHandleSubmit = () => {
+    const productSelected = productList.filter((item) =>
+      checkBoxProductDataList.includes(item.id)
+    );
     const payload = {
+      sdt: form.getFieldValue("sdt"),
+      fullname: form.getFieldValue("fullNameClient"),
       numberOfPeopleBooked: form.getFieldValue("numberOfPeopleBooked"),
-      status: status + 1,
+      dateTime: form.getFieldValue("reservationDate"),
+      idCategoryDiningRoom: form.getFieldValue("categoryRoom"),
+      listPorduct: productSelected,
+      idRoom: form.getFieldValue("room"),
+      idTable: checkBoxDataList,
+      status: 1,
     };
-    ReservationApi.changeStatus(payload, id).then((res) => {
-      alert(res);
-    });
+    try {
+      // console.log(payload.listPorduct);
+      OrderApi.addByAdmin(payload);
+      addToast("Thêm mới thành công!", {
+        appearance: "success",
+        autoDismiss: true,
+        autoDismissTimeout: 1000,
+      });
+      history.push(`/admin/orders`);
+    } catch (error) {
+      console.error("Lỗi khi add phiếu đặt:", error);
+    }
   };
 
   // đổi sản phẩm
@@ -429,11 +449,6 @@ const OrderAdd = () => {
                   <Select
                     placeholder="Chọn phòng"
                     onChange={handleOnChangeRoom}
-                    defaultValue={
-                      roomList && roomList.length > 0
-                        ? roomList[0].id
-                        : undefined
-                    }
                   >
                     {roomList &&
                       roomList?.map((item) => {
@@ -453,7 +468,7 @@ const OrderAdd = () => {
                 name="table"
                 labelCol={{ span: 2, offset: 1 }}
                 tooltip="bàn ăn"
-                rules={[{ required: true }]}
+                rules={[{ required: false }]}
               >
                 <Table dataSource={dataDinnerTable} columns={tableColumns} />
               </Form.Item>
@@ -475,7 +490,7 @@ const OrderAdd = () => {
                 name="product"
                 labelCol={{ span: 2, offset: 1 }}
                 tooltip="món ăn"
-                rules={[{ required: true }]}
+                rules={[{ required: false }]}
               >
                 <Table dataSource={dataProduct} columns={tableProductColumns} />
               </Form.Item>
@@ -494,7 +509,12 @@ const OrderAdd = () => {
 
           <Form.Item wrapperCol={{ span: 16, offset: 4 }}>
             {/* {button(status, onHandleSubmit)} */}
-            <Button type="primary" htmlType="submit" block>
+            <Button
+              type="primary"
+              htmlType="submit"
+              block
+              onClick={onHandleSubmit}
+            >
               Tạo phiếu đặt
             </Button>
           </Form.Item>
