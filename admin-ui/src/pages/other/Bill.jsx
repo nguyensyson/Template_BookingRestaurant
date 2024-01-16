@@ -17,8 +17,13 @@ class Bill extends React.Component {
         <table style={tableStyles} border={1}>
           <tbody>
             <tr>
-              <td colSpan={2}>Mã đơn: {curentInfo.id}</td>
-              <td colSpan={3} className="text-right">
+              <td colSpan={1}>Mã đơn: {curentInfo.id}</td>
+              <td colSpan={2} className="text-center">
+                {curentInfo.oderStatus === 4
+                  ? "Đã thanh toán"
+                  : "Chưa thanh toán"}
+              </td>
+              <td colSpan={2} className="text-right">
                 <strong>Thời gian đặt: {curentInfo.reservationDate}</strong>
               </td>
             </tr>

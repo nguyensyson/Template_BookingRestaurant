@@ -15,16 +15,23 @@ import { NavLink } from "react-router-dom";
 import { BiEdit } from "react-icons/bi";
 import { LuClipboardList } from "react-icons/lu";
 import { ImBin } from "react-icons/im";
+import ProductApi from "../../../api/product/ProductApi";
 import LoadingSpin from "../../loading/LoadingSpin";
 import { useToasts } from "react-toast-notifications";
 import Swal from "sweetalert2";
-import { format } from "date-fns";
-import discountApi from "../../../api/Discount/DiscountApi";
 
-const DiscountList = () => {
+const ComboList = () => {
   const { addToast } = useToasts();
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState([]);
+  const [data, setData] = useState({
+    totalItems: 0,
+    totalPages: 0,
+    page: 1,
+    pageSize: 10,
+    hasPrevious: false,
+    hasNext: true,
+    data: [],
+  });
   const handlePaginationChange = (page, pageSize) => {
     setParam(
       (prev) =>
@@ -124,12 +131,15 @@ const DiscountList = () => {
   });
   useEffect(() => {
     let isMounted = true;
-    const getDiscountAll = () => {
+    const getProducts = () => {
       try {
         setLoading(true);
-        discountApi.getDiscount().then((res) => {
+        ProductApi.searchCombo({
+          page: param.page,
+          size: param.size,
+        }).then((res) => {
           setData(res);
-          dataSource = res;
+          dataSource = res.content;
         });
         setLoading(false);
       } catch (error) {
@@ -138,53 +148,54 @@ const DiscountList = () => {
         }
       }
     };
-    getDiscountAll();
+    getProducts();
     return () => {
       isMounted = false;
     };
   }, [param]);
 
   // Remove product
-  // const handleOk = async (id) => {
-  //   try {
-  //     await categoryAPI.removeProduct(id);
-  //     const { data } = await categoryAPI.getAllProduct(param);
-  //     setData(data);
-  //     Swal.fire({
-  //       icon: "success",
-  //       title: "Thành công",
-  //       text: "Xóa sản phẩm thành công!",
-  //     });
-  //   } catch (error) {
-  //     Swal.fire({
-  //       icon: "error",
-  //       title: "Thất bại...",
-  //       text: "Xóa sản phẩm thất bại!",
-  //     });
-  //   }
-  // };
-  // const handleCancel = () => {
-  //   addToast("Hủy xóa", {
-  //     appearance: "error",
-  //     autoDismiss: true,
-  //     autoDismissTimeout: 1000,
-  //   });
-  // };
+  const handleOk = async (id) => {
+    try {
+      await ProductApi.removeProduct(id);
+      const { data } = await ProductApi.getAllProduct(param);
+      setData(data);
+      Swal.fire({
+        icon: "success",
+        title: "Thành công",
+        text: "Xóa sản phẩm thành công!",
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Thất bại...",
+        text: "Xóa sản phẩm thất bại!",
+      });
+    }
+  };
+  const handleCancel = () => {
+    addToast("Hủy xóa", {
+      appearance: "error",
+      autoDismiss: true,
+      autoDismissTimeout: 1000,
+    });
+  };
   let dataSource = [];
-  if (data && data.length > 0) {
-    dataSource = data?.map((item, index) => {
+  if (data && data.content && data.content.length > 0) {
+    dataSource = data.content?.map((item, index) => {
       return {
         key: index + 1,
         id: item.id,
-        nameDiscount: item.nameDiscount,
-        discountValue: item.discountValue,
-        startDate: item.startDate,
-        endDate: item.endDate,
+        name: item.name,
+        image: item.avatar,
+        price: item.price + " " + "VNĐ",
+        // discount: item.discount,
+        // categoryName: item.category.nameCategory,
         status:
           item.status === 1 ? (
-            <Tag color="green">Đang hoạt động</Tag>
+            <Tag color="green">Đang phục vụ</Tag>
           ) : (
-            <Tag color="red">Ngưng hoạt động</Tag>
+            <Tag color="red">Ngưng phục vụ</Tag>
           ),
       };
     });
@@ -197,32 +208,46 @@ const DiscountList = () => {
       align: "center",
     },
     {
-      title: "Tên discount",
-      dataIndex: "nameDiscount",
-      key: "nameDiscount",
+      title: "Tên combo",
+      dataIndex: "name",
+      key: "name",
       align: "center",
-      ...getColumnSearchProps("nameDiscount"),
+      ...getColumnSearchProps("name"),
+    },
+    {
+      title: "Hình ảnh",
+      dataIndex: "image",
+      key: "image",
+      align: "center",
+      render: (image) => (
+        <Image
+          src={image}
+          alt={image}
+          width={100}
+          height={100}
+          className="object-fit-cover border rounded border border-white"
+        />
+      ),
+    },
+    {
+      title: "Giá combo",
+      dataIndex: "price",
+      key: "price",
+      align: "center",
     },
     {
       title: "Giảm giá (%)",
-      dataIndex: "discountValue",
-      key: "discountValue",
+      dataIndex: "discount",
+      key: "discount",
       align: "center",
     },
-    {
-      title: "Ngày bắt đầu",
-      dataIndex: "startDate",
-      key: "startDate",
-      align: "center",
-      render: (startDate) => <>{format(new Date(startDate), "dd/MM/yyyy")}</>,
-    },
-    {
-      title: "Ngày kết thúc",
-      dataIndex: "endDate",
-      key: "endDate",
-      align: "center",
-      render: (endDate) => <>{format(new Date(endDate), "dd/MM/yyyy")}</>,
-    },
+    // {
+    //   title: "Tên danh mục",
+    //   dataIndex: "categoryName",
+    //   key: "categoryName",
+    //   align: "center",
+    //   render: (categoryName) => <Tag color="#f50">{categoryName}</Tag>,
+    // },
     {
       title: "Trạng thái",
       dataIndex: "status",
@@ -236,7 +261,7 @@ const DiscountList = () => {
       align: "center",
       render: (text, record) => (
         <Space size="middle">
-          <NavLink to={`/admin/discount-edit/${record.id}`}>
+          <NavLink to={`/admin/combo-edit/${record.id}`}>
             <BiEdit className="text-info" />
           </NavLink>
           {/* <NavLink to={`/admin/comment/${record.id}`}>
@@ -266,7 +291,7 @@ const DiscountList = () => {
         }}
       >
         <Breadcrumb.Item>Bảng điều khiển</Breadcrumb.Item>
-        <Breadcrumb.Item>Danh sách discount</Breadcrumb.Item>
+        <Breadcrumb.Item>Danh sách sản phẩm</Breadcrumb.Item>
       </Breadcrumb>
       <div>
         {loading && (
@@ -279,9 +304,9 @@ const DiscountList = () => {
             <Table
               dataSource={dataSource}
               columns={columns}
-              pagination={true}
+              pagination={false}
             />
-            {/* <Pagination
+            <Pagination
               style={{
                 textAlign: "right",
                 padding: "10px 20px",
@@ -292,12 +317,12 @@ const DiscountList = () => {
               onChange={handlePaginationChange}
               showSizeChanger
               showTotal={(total) => `Tổng ${total} sản phẩm`}
-            /> */}
+            />
           </div>
         )}
         {dataSource.length === 0 && !loading && (
           <div className="text-center">
-            <h5>Không có discount nào</h5>
+            <h5>Không có sản phẩm nào</h5>
           </div>
         )}
       </div>
@@ -305,4 +330,4 @@ const DiscountList = () => {
   );
 };
 
-export default DiscountList;
+export default ComboList;

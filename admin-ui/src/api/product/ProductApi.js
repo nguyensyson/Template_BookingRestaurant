@@ -6,12 +6,6 @@ const ProductApi = {
         return axiosClient.post(url,{
             page: body.page,
             size : body.size,
-        } , {
-            headers: {
-                Authorization: `Bearer ${
-                    localStorage.getItem("token") || ""
-                }`,
-            },
         });
     },
     CreateProduct: (body) => {
@@ -61,7 +55,52 @@ const ProductApi = {
     getAllByReservationId: (id) => {
         const url = `/view/product/getAll/${id}`;
         return axiosClient.get(url);
-    }
+    },
+    getAllByComboId: (id) => {
+        const url = `/view/product/getAllNotCombo/${id}`;
+        return axiosClient.get(url);
+    },
+    searchCombo: (body) => {
+        const url = `/view/product/combo/search`;
+        return axiosClient.post(url, {
+            page: body.page,
+            size : body.size,
+        });
+    },
+    detailCombo: (id) => {
+        const url = `/view/product/combo/${id}`;
+        return axiosClient.get(url);
+    },
+    CreateCombo: (body) => {
+        const url = "admin/product/combo/add";
+        return axiosClient.post(url, body, {
+            headers: {
+                Authorization: `Bearer ${
+                    localStorage.getItem("token") || ""
+                }`,
+            },
+        });
+    },
+    UpdateCombo: (id, body) => {
+        const url = `admin/product/combo/update/${id}`;
+        return axiosClient.put(url, body, {
+            headers: {
+                Authorization: `Bearer ${
+                    localStorage.getItem("token") || ""
+                }`,
+            },
+        });
+    },
+    ChangeProduct: (id, body) => {
+        const url = `admin/product/combo/changeProduct/${id}`;
+        return axiosClient.put(url, body, {
+            headers: {
+                Authorization: `Bearer ${
+                    localStorage.getItem("token") || ""
+                }`,
+            },
+        });
+    },
 };
 
 export default ProductApi;

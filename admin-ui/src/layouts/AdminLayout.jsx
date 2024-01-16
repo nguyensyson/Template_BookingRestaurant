@@ -52,6 +52,10 @@ import DinnerRoomUpdate from "../components/admin/RoomManager/DinnerRoomUpdate";
 import DinnerTableList from "../components/admin/TableManager/DinnerTableList";
 import DinnerTableAdd from "../components/admin/TableManager/DinnerTableAdd";
 import DinnerTableUpdate from "../components/admin/TableManager/DinnerTableUpdate";
+import ComboList from "../components/admin/ProductsManager/ComboList";
+import ComboAdd from "../components/admin/ProductsManager/ComboAdd";
+import ComboEdit from "../components/admin/ProductsManager/ComboEdit";
+import DiscountEdit from "../components/admin/DiscountManager/DiscountEdit";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -155,6 +159,12 @@ const AdminLayout = () => {
             </Menu.Item>
             <Menu.Item key="/admin/products-add" icon={<IoCreateOutline />}>
               <NavLink to="/admin/products-add">Tạo sản phẩm</NavLink>
+            </Menu.Item>
+            <Menu.Item key="/admin/combo" icon={<CiBoxList />}>
+              <NavLink to="/admin/combo">Danh sách combo</NavLink>
+            </Menu.Item>
+            <Menu.Item key="/admin/combo-add" icon={<IoCreateOutline />}>
+              <NavLink to="/admin/combo-add">Tạo combo</NavLink>
             </Menu.Item>
           </SubMenu>
           {/* Category Manager */}
@@ -264,6 +274,9 @@ const AdminLayout = () => {
             <Route path="/admin/products" component={ProductList} />
             <Route path="/admin/products-add" component={ProductAdd} />
             <Route path="/admin/products-edit/:id" component={ProductEdit} />
+            <Route path="/admin/combo" component={ComboList} />
+            <Route path="/admin/combo-add" component={ComboAdd} />
+            <Route path="/admin/combo-edit/:id" component={ComboEdit} />
             {/* Category router */}
             <Route path="/admin/categories" component={CategoryList} />
             <Route path="/admin/categories-add" component={CategoryAdd} />
@@ -293,6 +306,7 @@ const AdminLayout = () => {
             {/* discount router */}
             <Route path="/admin/discounts" component={DiscountList} />
             <Route path="/admin/discount-add" component={DiscountAdd} />
+            <Route path="/admin/discount-edit/:id" component={DiscountEdit} />
             {/* dinner room router */}
             <Route path="/admin/dinner-room" component={DinnerRoomList} />
             <Route path="/admin/room-add" component={DinnerRoomAdd} />

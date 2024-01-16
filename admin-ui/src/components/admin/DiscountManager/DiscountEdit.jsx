@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Breadcrumb, Button, Form, Input } from "antd";
+import { Breadcrumb, Button, Form, Input, Select } from "antd";
 import Title from "antd/es/typography/Title";
 import LoadingSpin from "../../loading/LoadingSpin";
-import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
+import {
+  useHistory,
+  useParams,
+} from "react-router-dom/cjs/react-router-dom.min";
 import { useToasts } from "react-toast-notifications";
 import VoucherApi from "../../../api/voucher/VoucherApi";
 import { format } from "date-fns";
@@ -10,6 +13,7 @@ import { DatePicker, Table } from "antd";
 import { ImBin } from "react-icons/im";
 import ProductApi from "../../../api/product/ProductApi";
 import TextArea from "antd/es/input/TextArea";
+import moment from "moment";
 import discountApi from "../../../api/Discount/DiscountApi";
 /* eslint-disable no-template-curly-in-string */
 const validateMessages = {
@@ -19,13 +23,14 @@ const validateMessages = {
   },
 };
 
-const DiscountAdd = () => {
+const DiscountEdit = () => {
   const { addToast } = useToasts();
   const history = useHistory();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [productList, setProductList] = useState([]);
   const [checkBoxProductDataList, setCheckBoxProductDataList] = useState([]);
+  const { id } = useParams();
 
   const columns = [
     {
@@ -85,6 +90,9 @@ const DiscountAdd = () => {
     const productSelected = productList
       .filter((item) => checkBoxProductDataList.includes(item.id))
       .map((item) => item.id);
+    const productIsOrdered = dataProduct
+      .filter((item) => item.isOrdered === true)
+      .map((item) => item.id);
     form.validateFields().then(async (item) => {
       const currentDate = new Date();
       const endDate = item.endDate;
@@ -113,7 +121,7 @@ const DiscountAdd = () => {
         introduce: item.introduce,
         startDate: item.startDate,
         endDate: item.endDate,
-        listProduct: productSelected,
+        listProduct: [...productSelected, ...productIsOrdered],
       };
       formDataApi.append("nameDiscount", formData.nameDiscount);
       formDataApi.append("discountValue", formData.discountValue);
@@ -129,7 +137,7 @@ const DiscountAdd = () => {
       // console.log(formData.endDate);
       // console.log(formData.listProduct);
 
-      const response = await discountApi.CreateDiscount(formData);
+      const response = await discountApi.updateDiscount(id, formData);
       addToast("Thêm mới mã giảm giá thành công!", {
         appearance: "success",
         autoDismiss: true,
@@ -140,16 +148,24 @@ const DiscountAdd = () => {
   };
 
   useEffect(() => {
-    const fetchProductList = async () => {
+    const fetchData = async () => {
       try {
-        const res = await ProductApi.getAllByReservationId(0);
-        setProductList(res);
+        const res = await discountApi.getDiscountDetail(id);
+        form.setFieldsValue({
+          nameDiscount: res?.nameDiscount,
+          discountValue: res?.discountValue,
+          introduce: res?.introduce,
+          status: res?.status,
+          startDate: moment(res?.startDate),
+          endDate: moment(res?.endDate),
+        });
+        setProductList(res.listProduct);
       } catch (error) {
         console.error("Lỗi khi tải danh sách món ăn:", error);
       }
     };
 
-    fetchProductList();
+    fetchData();
   }, []);
 
   return (
@@ -160,11 +176,11 @@ const DiscountAdd = () => {
         }}
       >
         <Breadcrumb.Item>Bảng điều khiển</Breadcrumb.Item>
-        <Breadcrumb.Item>Tạo mã khuyến mại</Breadcrumb.Item>
+        <Breadcrumb.Item>Cập nhật khuyến mại</Breadcrumb.Item>
       </Breadcrumb>
       <div className="mt-3">
         <Title level={4} className="text-uppercase text-center">
-          Thêm khuyến mại
+          Cập nhật khuyến mại
         </Title>
         {loading && (
           <div>
@@ -216,6 +232,22 @@ const DiscountAdd = () => {
             <TextArea rows={3} placeholder="Mô tả combo..." />
           </Form.Item>
           <Form.Item
+            label="Trạng thái"
+            name="status"
+            style={{ width: "calc(100% - 210px)" }}
+            labelCol={{ span: 3, offset: 1 }}
+            rules={[{ required: true }]}
+          >
+            <Select placeholder="Chọn trạng thái">
+              <Select.Option key="1" value="1">
+                Hoạt động
+              </Select.Option>
+              <Select.Option key="0" value="0">
+                Ngưng hoạt động
+              </Select.Option>
+            </Select>
+          </Form.Item>
+          <Form.Item
             label="Ngày bắt đầu"
             name="startDate"
             labelCol={{ span: 3, offset: 1 }}
@@ -246,7 +278,7 @@ const DiscountAdd = () => {
               onClick={onHandleSubmit}
               block
             >
-              Thêm mới khuyến mại
+              Cập nhật khuyến mại
             </Button>
           </Form.Item>
         </Form>
@@ -258,4 +290,4 @@ const DiscountAdd = () => {
   );
 };
 
-export default DiscountAdd;
+export default DiscountEdit;

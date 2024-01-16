@@ -191,7 +191,11 @@ const ProductList = () => {
         price: item.price.toLocaleString("vi-VN") + " " + "VNĐ",
         discount: item.discount,
         categoryName: item.category.nameCategory,
-        status: (item.status = 1 ? "Đang phục vụ" : "Ngưng phục vụ"),
+        status: (item.status = 1 ? (
+          <Tag color="green">Đang phục vụ</Tag>
+        ) : (
+          <Tag color="red">Ngưng phục vụ</Tag>
+        )),
       };
     });
   }

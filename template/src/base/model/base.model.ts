@@ -11,5 +11,5 @@ export class Pageable<Type> {
 
 export class PageRequest {
     public page?: number = 0;
-    public size?: number = 10;
+    public size?: number = 12;
 }

@@ -268,24 +268,33 @@ const OrderAdd = () => {
     fetchCategoryDinningRoomList();
   }, [id, form]);
 
-  const onHandleSubmit = () => {
-    const productSelected = productList.filter((item) =>
-      checkBoxProductDataList.includes(item.id)
-    );
-    const payload = {
-      sdt: form.getFieldValue("sdt"),
-      fullname: form.getFieldValue("fullNameClient"),
-      numberOfPeopleBooked: form.getFieldValue("numberOfPeopleBooked"),
-      dateTime: form.getFieldValue("reservationDate"),
-      idCategoryDiningRoom: form.getFieldValue("categoryRoom"),
-      listPorduct: productSelected,
-      idRoom: form.getFieldValue("room"),
-      idTable: checkBoxDataList,
-      status: 1,
-    };
+  const onHandleSubmit = async () => {
     try {
-      // console.log(payload.listPorduct);
-      OrderApi.addByAdmin(payload);
+      // Validate form fields
+      const values = await form.validateFields();
+
+      // Filter selected products
+      const productSelected = productList.filter((item) =>
+        checkBoxProductDataList.includes(item.id)
+      );
+
+      // Prepare payload
+      const payload = {
+        sdt: values.sdt,
+        fullname: values.fullNameClient,
+        numberOfPeopleBooked: values.numberOfPeopleBooked,
+        dateTime: values.reservationDate,
+        idCategoryDiningRoom: values.categoryRoom,
+        listPorduct: productSelected,
+        idRoom: values.room,
+        idTable: checkBoxDataList,
+        status: 1,
+      };
+
+      // Call API to add order
+      await OrderApi.addByAdmin(payload);
+
+      // Show success message and redirect
       addToast("Thêm mới thành công!", {
         appearance: "success",
         autoDismiss: true,
@@ -494,16 +503,6 @@ const OrderAdd = () => {
               >
                 <Table dataSource={dataProduct} columns={tableProductColumns} />
               </Form.Item>
-
-              {/* <div className={`col-12 d-flex justify-content-center`}>
-                <button
-                  type={`button`}
-                  className={`btn btn-primary`}
-                  onClick={onChangeProduct}
-                >
-                  Thêm món
-                </button>
-              </div> */}
             </div>
           </div>
 

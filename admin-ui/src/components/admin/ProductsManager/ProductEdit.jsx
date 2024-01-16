@@ -41,7 +41,14 @@ const ProductEdit = () => {
     const getProductDetail = (id) => {
       ProductApi.getProductDetail(id).then((res) => {
         setPreview(res.avatar);
-        form.setFieldsValue(res);
+        form.setFieldsValue({
+          name: res?.name,
+          price: res?.price,
+          // introduce: res?.introduce,
+          images: res?.avatar,
+          category: res?.category?.id,
+          status: res?.status,
+        });
         setInitialState(res.status);
       });
     };
@@ -83,6 +90,7 @@ const ProductEdit = () => {
         introduce: item.introduce,
         images: fileList[0] || preview,
         category: item.category,
+        status: item.status,
       };
       const formDataApi = new FormData();
       formDataApi.append("name", formData.name);
@@ -90,6 +98,7 @@ const ProductEdit = () => {
       formDataApi.append("introduce", formData.introduce);
       formDataApi.append("category", formData.category);
       formDataApi.append("images", formData.images);
+      formDataApi.append("status", formData.status);
       try {
         await ProductApi.updateProduct(id, formDataApi);
         setLoading(false);
@@ -181,7 +190,7 @@ const ProductEdit = () => {
                 labelCol={{ span: 4, offset: 4 }}
                 rules={[{ required: true }]}
               >
-                <Select placeholder="Chọn danh mục" defaultValue={1}>
+                <Select placeholder="Chọn danh mục">
                   {categories &&
                     categories.map((item) => {
                       return (
@@ -193,24 +202,24 @@ const ProductEdit = () => {
                 </Select>
               </Form.Item>
             </Col>
-            {/*<Col span={12}>*/}
-            {/*    <Form.Item*/}
-            {/*        label="Trạng thái"*/}
-            {/*        name="Status"*/}
-            {/*        style={{width: "calc(100% - 131px)"}}*/}
-            {/*        labelCol={{span: 0, offset: 0}}*/}
-            {/*        rules={[{required: true}]}*/}
-            {/*    >*/}
-            {/*        <Select placeholder="Chọn trạng thái">*/}
-            {/*            <Select.Option key="1" value="1">*/}
-            {/*                Hiển thị*/}
-            {/*            </Select.Option>*/}
-            {/*            <Select.Option key="0" value="0">*/}
-            {/*                Ẩn*/}
-            {/*            </Select.Option>*/}
-            {/*        </Select>*/}
-            {/*    </Form.Item>*/}
-            {/*</Col>*/}
+            <Col span={12}>
+              <Form.Item
+                label="Trạng thái"
+                name="status"
+                style={{ width: "calc(100% - 210px)" }}
+                labelCol={{ span: 6, offset: 2 }}
+                rules={[{ required: true }]}
+              >
+                <Select placeholder="Chọn trạng thái">
+                  <Select.Option key="1" value="1">
+                    Phục vụ
+                  </Select.Option>
+                  <Select.Option key="2" value="2">
+                    Ngưng phục vụ
+                  </Select.Option>
+                </Select>
+              </Form.Item>
+            </Col>
           </Row>
           <Form.Item
             label="Hình ảnh"

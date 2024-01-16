@@ -19,6 +19,7 @@ import DinningRoomApi from "../../../api/dinning-room/DinningRoomApi";
 import DinnerTableApi from "../../../api/dinner-table/DinnerTableApi";
 import moment from "moment";
 import ProductApi from "../../../api/product/ProductApi";
+import Swal from "sweetalert2";
 
 const OrderUpdate = () => {
   const { id } = useParams();
@@ -155,6 +156,12 @@ const OrderUpdate = () => {
         record.quantity = +e.target.value;
       }
     });
+    dataProduct.forEach((item) => {
+      if (item.id === record.id) {
+        item.quantity = +e.target.value;
+        record.quantity = +e.target.value;
+      }
+    });
   };
   const button = (status, f) => {
     if (status === 1) {
@@ -272,23 +279,77 @@ const OrderUpdate = () => {
     fetchCategoryDinningRoomList();
   }, [id, form]);
 
-  const onHandleSubmit = () => {
-    const payload = {
-      numberOfPeopleBooked: form.getFieldValue("numberOfPeopleBooked"),
-      status: status + 1,
-    };
-    ReservationApi.changeStatus(payload, id).then((res) => {
-      alert(res);
-    });
-    history.push(`/admin/orders`);
-    window.location.reload();
+  const onHandleSubmit = async () => {
+    try {
+      // Validate form fields
+      const values = await form.validateFields();
+
+      const payload = {
+        numberOfPeopleBooked: form.getFieldValue("numberOfPeopleBooked"),
+        status: status + 1,
+      };
+      ReservationApi.changeStatus(payload, id).then((res) => {
+        addToast("Cập nhật thành công!", {
+          appearance: "success",
+          autoDismiss: true,
+          autoDismissTimeout: 1000,
+        });
+      });
+      history.push(`/admin/orders`);
+      window.location.reload();
+      // Show success message and redirect
+    } catch (error) {
+      console.error("Lỗi khi add phiếu đặt:", error);
+    }
+  };
+
+  const onHandleCacel = async () => {
+    try {
+      const payload = {
+        numberOfPeopleBooked: form.getFieldValue("numberOfPeopleBooked"),
+        status: 5,
+      };
+      ReservationApi.changeStatus(payload, id).then((res) => {
+        addToast("Cập nhật thành công!", {
+          appearance: "success",
+          autoDismiss: true,
+          autoDismissTimeout: 1000,
+        });
+      });
+      history.push(`/admin/orders`);
+      window.location.reload();
+      // Show success message and redirect
+    } catch (error) {
+      console.error("Lỗi khi add phiếu đặt:", error);
+    }
+  };
+
+  const onHandlerecacel = async () => {
+    try {
+      const payload = {
+        numberOfPeopleBooked: form.getFieldValue("numberOfPeopleBooked"),
+        status: 1,
+      };
+      ReservationApi.changeStatus(payload, id).then((res) => {
+        addToast("Cập nhật thành công!", {
+          appearance: "success",
+          autoDismiss: true,
+          autoDismissTimeout: 1000,
+        });
+      });
+      history.push(`/admin/orders`);
+      window.location.reload();
+      // Show success message and redirect
+    } catch (error) {
+      console.error("Lỗi khi add phiếu đặt:", error);
+    }
   };
 
   const onChangeProduct = () => {
     const productSelected = productList.filter((item) =>
       checkBoxProductDataList.includes(item.id)
     );
-    const productIsOrdered = dataProduct
+    const productIsOrdered = productList
       .filter((item) => item.isOrdered === true)
       .map((item) => item);
     const payload = {
@@ -306,10 +367,12 @@ const OrderUpdate = () => {
         0
       ),
     };
+    console.log(productSelected);
+    console.log(productIsOrdered);
     ReservationApi.changeProduct(payload, id).then((res) => {
       alert(res);
     });
-    window.location.reload();
+    // window.location.reload();
   };
 
   return (
@@ -493,7 +556,7 @@ const OrderUpdate = () => {
                   name="room"
                   labelCol={{ span: 5, offset: 1 }}
                   tooltip="phòng"
-                  rules={[{ required: true }]}
+                  rules={[{ required: false }]}
                 >
                   <Select
                     placeholder="Chọn phòng"
@@ -542,7 +605,12 @@ const OrderUpdate = () => {
                 // name="product"
                 labelCol={{ span: 2, offset: 1 }}
                 tooltip="món ăn"
-                rules={[{ required: true }]}
+                rules={[
+                  {
+                    required: status === 2, // Đặt điều kiện cho việc yêu cầu dựa trên giá trị của biến status
+                    message: "Vui lòng chọn món ăn", // Message hiển thị khi quy tắc không được đáp ứng
+                  },
+                ]}
               >
                 <Table dataSource={dataProduct} columns={tableProductColumns} />
               </Form.Item>
@@ -560,7 +628,33 @@ const OrderUpdate = () => {
           </div>
 
           <Form.Item wrapperCol={{ span: 16, offset: 4 }}>
+            {status === 5 && (
+              <Button
+                type="primary"
+                htmlType="submit"
+                onClick={onHandlerecacel}
+                block
+                success
+              >
+                Hoàn đơn
+              </Button>
+            )}
+          </Form.Item>
+          <Form.Item wrapperCol={{ span: 16, offset: 4 }}>
             {button(status, onHandleSubmit)}
+          </Form.Item>
+          <Form.Item wrapperCol={{ span: 16, offset: 4 }}>
+            {(status === 1 || status === 2) && (
+              <Button
+                type="primary"
+                htmlType="submit"
+                onClick={onHandleCacel}
+                block
+                danger
+              >
+                Huỷ đơn
+              </Button>
+            )}
           </Form.Item>
         </Form>
       </div>

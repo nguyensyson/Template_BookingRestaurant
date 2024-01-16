@@ -75,46 +75,44 @@ const OrderList = () => {
   };
 
   const handlePaginationChange = (page, pageSize) => {
-    setParam((prev) => ({
-      ...prev,
+    setParam({
       page: page,
       pageSize: pageSize,
-    }));
+    });
   };
 
   const [param, setParam] = useState({
     page: 0,
     pageSize: 10,
-    search: "",
   });
 
   useEffect(() => {
-    let isMounted = true;
+    // let isMounted = true;
     const getOrders = () => {
       try {
-        setLoading(true);
+        // setLoading(true);
         OrderApi.getAllOrders(param).then((response) => {
-          if (isMounted) {
-            // Kiểm tra xem response có chứa dữ liệu hợp lệ không
-            setTableData(response);
-            setLoading(false);
-            console.log("Danh sách đơn hàng:", tableData);
-          }
+          // if (isMounted) {
+          // Kiểm tra xem response có chứa dữ liệu hợp lệ không
+          setTableData(response);
+          // setLoading(false);
+          console.log("Danh sách đơn hàng:", tableData);
+          // }
         });
       } catch (error) {
         console.error("Lỗi khi tải đơn hàng:", error);
-        if (isMounted) {
-          setLoading(false);
-        }
+        // if (isMounted) {
+        //   setLoading(false);
+        // }
       }
     };
 
     getOrders();
 
     // Cleanup function
-    return () => {
-      isMounted = false;
-    };
+    // return () => {
+    //   isMounted = false;
+    // };
   }, [param]);
   const dataSource = tableData.content?.map((item, index) => ({
     id: item.id,
