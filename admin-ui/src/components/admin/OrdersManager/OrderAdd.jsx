@@ -272,11 +272,49 @@ const OrderAdd = () => {
     try {
       // Validate form fields
       const values = await form.validateFields();
+      let hasError = false;
+
+      const currentDate = new Date();
+      const date = values.reservationDate;
+      if (date <= currentDate) {
+        addToast("Ngày đặt phải lớn hơn ngày hiện tại!", {
+          appearance: "error",
+          autoDismiss: true,
+          autoDismissTimeout: 3000,
+        });
+        hasError = true;
+        return;
+      }
 
       // Filter selected products
       const productSelected = productList.filter((item) =>
         checkBoxProductDataList.includes(item.id)
       );
+
+      productSelected.forEach((product) => {
+        if (product.quantity <= 0) {
+          addToast("Số lượng sản phẩm phải lớn hơn 0!", {
+            appearance: "error",
+            autoDismiss: true,
+            autoDismissTimeout: 3000,
+          });
+          hasError = true;
+          return;
+        }
+      });
+
+      checkBoxDataList.forEach((c) => {
+        if (c.status === 0) {
+          addToast("Bàn đã được đặt!", {
+            appearance: "error",
+            autoDismiss: true,
+            autoDismissTimeout: 3000,
+          });
+          hasError = true;
+          return;
+        }
+        console.log(c);
+      });
 
       // Prepare payload
       const payload = {
@@ -290,6 +328,11 @@ const OrderAdd = () => {
         idTable: checkBoxDataList,
         status: 1,
       };
+
+      if (hasError) {
+        // Nếu có lỗi, dừng chương trình tại đây
+        return;
+      }
 
       // Call API to add order
       await OrderApi.addByAdmin(payload);

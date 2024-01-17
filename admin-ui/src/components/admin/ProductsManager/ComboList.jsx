@@ -189,7 +189,7 @@ const ComboList = () => {
         name: item.name,
         image: item.avatar,
         price: item.price + " " + "VNĐ",
-        // discount: item.discount,
+        discount: item.discount,
         // categoryName: item.category.nameCategory,
         status:
           item.status === 1 ? (

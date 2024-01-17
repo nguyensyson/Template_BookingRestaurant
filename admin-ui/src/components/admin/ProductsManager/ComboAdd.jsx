@@ -149,9 +149,23 @@ const ComboAdd = () => {
     //     price: item.price,
     //     quantity: item.quantity,
     //   }));
+    let hasError = false;
     const productSelected = productList.filter((item) =>
       checkBoxProductDataList.includes(item.id)
     );
+
+    productSelected.forEach((product) => {
+      if (product.quantity <= 0) {
+        addToast("Số lượng sản phẩm phải lớn hơn 0!", {
+          appearance: "error",
+          autoDismiss: true,
+          autoDismissTimeout: 3000,
+        });
+        hasError = true;
+        return;
+      }
+    });
+
     const payload = {
       listPorduct: productSelected,
       originalPrice: productSelected.reduce(
@@ -167,6 +181,11 @@ const ComboAdd = () => {
         0
       ),
     };
+
+    if (hasError) {
+      // Nếu có lỗi, dừng chương trình tại đây
+      return;
+    }
     form.validateFields().then(async (item) => {
       const formDataApi = new FormData();
       const formData = {

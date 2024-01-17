@@ -108,12 +108,12 @@ const DinnerTableUpdate = () => {
         }}
       >
         <Breadcrumb.Item>Bảng điều khiển</Breadcrumb.Item>
-        <Breadcrumb.Item>Tạo bàn</Breadcrumb.Item>
+        <Breadcrumb.Item>cập nhật bàn</Breadcrumb.Item>
       </Breadcrumb>
       {contextHolder}
       <div className="mt-3">
         <Title level={4} className="text-uppercase text-center">
-          Thêm bàn
+          cập nhật bàn
         </Title>
         {loading && (
           <div>
@@ -194,7 +194,7 @@ const DinnerTableUpdate = () => {
               onClick={onHandleSubmit}
               block
             >
-              Thêm mới bàn
+              Cập nhật bàn
             </Button>
           </Form.Item>
         </Form>

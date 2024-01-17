@@ -145,12 +145,37 @@ const ComboEdit = () => {
     setPreview(filePreview);
   };
   const onHandleSubmit = () => {
+    let hasError = false;
     const productSelected = productList.filter((item) =>
       checkBoxProductDataList.includes(item.id)
     );
     const productIsOrdered = productList
       .filter((item) => item.isOrdered === true)
       .map((item) => item);
+
+    productSelected.forEach((product) => {
+      if (product.quantity <= 0) {
+        addToast("Số lượng sản phẩm phải lớn hơn 0!", {
+          appearance: "error",
+          autoDismiss: true,
+          autoDismissTimeout: 3000,
+        });
+        hasError = true;
+        return;
+      }
+    });
+
+    productIsOrdered.forEach((product) => {
+      if (product.quantity <= 0) {
+        addToast("Số lượng sản phẩm phải lớn hơn 0!", {
+          appearance: "error",
+          autoDismiss: true,
+          autoDismissTimeout: 3000,
+        });
+        hasError = true;
+        return;
+      }
+    });
     const payload = {
       listPorduct: [...productIsOrdered, ...productSelected],
       originalPrice: productSelected.reduce(
@@ -166,6 +191,11 @@ const ComboEdit = () => {
         0
       ),
     };
+
+    if (hasError) {
+      // Nếu có lỗi, dừng chương trình tại đây
+      return;
+    }
     form.validateFields().then(async (item) => {
       const formDataApi = new FormData();
       const formData = {

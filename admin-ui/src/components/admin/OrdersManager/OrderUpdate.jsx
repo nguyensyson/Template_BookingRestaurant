@@ -282,7 +282,25 @@ const OrderUpdate = () => {
   const onHandleSubmit = async () => {
     try {
       // Validate form fields
+      let hasError = false;
       const values = await form.validateFields();
+
+      const currentDate = new Date();
+      const date = values.reservationDate;
+      if (date <= currentDate) {
+        addToast("Ngày đặt phải lớn hơn ngày hiện tại!", {
+          appearance: "error",
+          autoDismiss: true,
+          autoDismissTimeout: 3000,
+        });
+        hasError = true;
+        return;
+      }
+
+      if (hasError) {
+        // Nếu có lỗi, dừng chương trình tại đây
+        return;
+      }
 
       const payload = {
         numberOfPeopleBooked: form.getFieldValue("numberOfPeopleBooked"),
@@ -345,13 +363,43 @@ const OrderUpdate = () => {
     }
   };
 
-  const onChangeProduct = () => {
+  const onChangeProduct = async () => {
+    let hasError = false;
     const productSelected = productList.filter((item) =>
       checkBoxProductDataList.includes(item.id)
     );
     const productIsOrdered = productList
       .filter((item) => item.isOrdered === true)
       .map((item) => item);
+
+    productSelected.forEach((product) => {
+      if (product.quantity <= 0) {
+        addToast("Số lượng sản phẩm phải lớn hơn 0!", {
+          appearance: "error",
+          autoDismiss: true,
+          autoDismissTimeout: 3000,
+        });
+        hasError = true;
+        return;
+      }
+    });
+
+    productIsOrdered.forEach((product) => {
+      if (product.quantity <= 0) {
+        addToast("Số lượng sản phẩm phải lớn hơn 0!", {
+          appearance: "error",
+          autoDismiss: true,
+          autoDismissTimeout: 3000,
+        });
+        hasError = true;
+        return;
+      }
+    });
+
+    if (hasError) {
+      // Nếu có lỗi, dừng chương trình tại đây
+      return;
+    }
     const payload = {
       listPorduct: [...productIsOrdered, ...productSelected],
       originalPrice: productSelected.reduce(
@@ -367,8 +415,8 @@ const OrderUpdate = () => {
         0
       ),
     };
-    console.log(productSelected);
-    console.log(productIsOrdered);
+    // console.log(productSelected);
+    // console.log(productIsOrdered);
     ReservationApi.changeProduct(payload, id).then((res) => {
       alert(res);
     });
@@ -591,13 +639,15 @@ const OrderUpdate = () => {
               </Form.Item>
             </div>
             <div className={`col-12 d-flex justify-content-center`}>
-              <button
-                type={`button`}
-                className={`btn btn-primary`}
-                onClick={arrangeSeats}
-              >
-                Sắp xếp chỗ ngồi
-              </button>
+              {status !== 4 && (
+                <button
+                  type={`button`}
+                  className={`btn btn-primary`}
+                  onClick={arrangeSeats}
+                >
+                  Sắp xếp chỗ ngồi
+                </button>
+              )}
             </div>
             <div className="col-12 mb-3">
               <Form.Item
@@ -616,13 +666,15 @@ const OrderUpdate = () => {
               </Form.Item>
 
               <div className={`col-12 d-flex justify-content-center`}>
-                <button
-                  type={`button`}
-                  className={`btn btn-primary`}
-                  onClick={onChangeProduct}
-                >
-                  Thêm món
-                </button>
+                {status !== 4 && (
+                  <button
+                    type={`button`}
+                    className={`btn btn-primary`}
+                    onClick={onChangeProduct}
+                  >
+                    Thêm món
+                  </button>
+                )}
               </div>
             </div>
           </div>

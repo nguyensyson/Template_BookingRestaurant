@@ -131,7 +131,7 @@ export default defineComponent({
 									</div>
 								</div>
 							</div>
-							<div class="discount-code-wrapper mt-25">
+							<!-- <div class="discount-code-wrapper mt-25"> 
 								<div class="title-wrap">
 									<h4 class="cart-bottom-title section-bg-gray">Mã giảm giá</h4>
 								</div>
@@ -143,7 +143,7 @@ export default defineComponent({
 										</v-col>
 									</v-row>
 								</div>
-							</div>
+							</div> -->
 							<v-row>
 								<v-col cols="12">
 									<v-btn color="primary" @click.prevent="addByUser(1)">Đặt lịch không đặt cọc</v-btn>
